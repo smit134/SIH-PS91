@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Handicraft & Handloom Production",
+    "code": "HANDICRAFT",
+    "description": "Artisanal handloom textiles, terracotta craft, and regional bamboo products. Low fixed capital barrier, high margin potential, relies on design and market connections.",
+    "min_capital": 20000,
+    "max_capital": 150000,
+    "typical_monthly_operating_cost": 15000,
+    "typical_monthly_revenue": 35000,
+    "risk_level": "MEDIUM",
+    "required_skills": ["Weaving", "Artisanal Craft", "Quality Finishing", "Packaging"],
+    "required_resources": ["STORAGE", "EQUIPMENT"],
+    "break_even_months_est": 8,
+    "is_active": true
+  },
+  {
+    "name": "Dairy & Milk Collection Center",
+    "code": "DAIRY",
+    "description": "Small-scale dairy cattle management, chilled milk aggregation, and supply to regional cooperative dairies. High asset requirement, steady recurring cash flow.",
+    "min_capital": 80000,
+    "max_capital": 350000,
+    "typical_monthly_operating_cost": 30000,
+    "typical_monthly_revenue": 55000,
+    "risk_level": "LOW",
+    "required_skills": ["Animal Husbandry", "Fodder Management", "Milk Quality Testing"],
+    "required_resources": ["LAND", "EQUIPMENT", "STORAGE"],
+    "break_even_months_est": 14,
+    "is_active": true
+  },
+  {
+    "name": "Grain Milling & Food Processing Unit",
+    "code": "FOOD_PROCESSING",
+    "description": "Micro-milling of pulses, spices, oilseeds, and flour with custom local packaging. Benefits from proximity to agricultural produce.",
+    "min_capital": 100000,
+    "max_capital": 400000,
+    "typical_monthly_operating_cost": 40000,
+    "typical_monthly_revenue": 75000,
+    "risk_level": "MEDIUM",
+    "required_skills": ["Machine Operation", "Hygienic Packaging", "Wholesale Sourcing"],
+    "required_resources": ["SHOP", "EQUIPMENT", "VEHICLE"],
+    "break_even_months_est": 11,
+    "is_active": true
+  },
+  {
+    "name": "Vermicompost & Bio-Fertilizer Unit",
+    "code": "VERMICOMPOST",
+    "description": "Organic fertilizer manufacturing utilizing cattle manure, agricultural biomass, and earthworm beds. High margin, eco-sustainable, and strong local farmer demand.",
+    "min_capital": 25000,
+    "max_capital": 120000,
+    "typical_monthly_operating_cost": 12000,
+    "typical_monthly_revenue": 32000,
+    "risk_level": "LOW",
+    "required_skills": ["Composting Technique", "Moisture Control", "Direct Farm Sales"],
+    "required_resources": ["LAND", "STORAGE"],
+    "break_even_months_est": 6,
+    "is_active": true
+  },
+  {
+    "name": "Rural Logistics & Agri-Retail Store",
+    "code": "AGRI_RETAIL_LOGISTICS",
+    "description": "Last-mile input supply (certified seeds, farm tools, animal feed) combined with local aggregation transport to nearby mandi/markets.",
+    "min_capital": 75000,
+    "max_capital": 300000,
+    "typical_monthly_operating_cost": 35000,
+    "typical_monthly_revenue": 65000,
+    "risk_level": "MEDIUM",
+    "required_skills": ["Inventory Control", "Retail Sales", "Logistics Coordination"],
+    "required_resources": ["VEHICLE", "SHOP", "STORAGE"],
+    "break_even_months_est": 9,
+    "is_active": true
+  }
+]

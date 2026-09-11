@@ -1,0 +1,43 @@
+[
+    {
+        "scheme_name": "PMEGP (Prime Minister's Employment Generation Programme)",
+        "effective_from": "2023-04-01",
+        "project_cap": 5000000,
+        "loan_cap": 4500000,
+        "interest_rate": 8.5,
+        "subsidy_percent": 25,
+        "eligibility": {
+            "min_age": 18,
+            "required_skills": [],
+            "max_project_cost": 5000000
+        },
+        "application_route": "https://www.kviconline.gov.in/pmegpeportal/pmegphome/index.jsp"
+    },
+    {
+        "scheme_name": "PMFME (Pradhan Mantri Formalisation of Micro food processing Enterprises)",
+        "effective_from": "2020-06-29",
+        "project_cap": 3000000,
+        "loan_cap": 2500000,
+        "interest_rate": 9.0,
+        "subsidy_percent": 35,
+        "eligibility": {
+            "min_age": 18,
+            "required_interests": ["Food processing", "Agri-business"],
+            "max_project_cost": 3000000
+        },
+        "application_route": "https://pmfme.mofpi.gov.in/"
+    },
+    {
+        "scheme_name": "MUDRA Loan (Shishu)",
+        "effective_from": "2015-04-08",
+        "project_cap": 50000,
+        "loan_cap": 50000,
+        "interest_rate": 10.0,
+        "subsidy_percent": 0,
+        "eligibility": {
+            "min_age": 18,
+            "max_project_cost": 50000
+        },
+        "application_route": "https://www.mudra.org.in/"
+    }
+]
