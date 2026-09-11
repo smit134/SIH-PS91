@@ -1,0 +1,29 @@
+[
+    {
+        "source": "Udyam Registry (Mock)",
+        "evidence_type": "Competitor",
+        "location_lat": 23.0225,
+        "location_lng": 72.5714,
+        "radius_km": 5.0,
+        "confidence": 80,
+        "content": "There are 3 registered micro-enterprises producing handicrafts within a 5km radius."
+    },
+    {
+        "source": "Local Market Data (Proxy)",
+        "evidence_type": "Demand",
+        "location_lat": 23.0225,
+        "location_lng": 72.5714,
+        "radius_km": 5.0,
+        "confidence": 60,
+        "content": "High regional demand for traditional textiles and handcrafted wooden items observed in local retail markets."
+    },
+    {
+        "source": "Agricultural API (Mock)",
+        "evidence_type": "Price",
+        "location_lat": 23.0225,
+        "location_lng": 72.5714,
+        "radius_km": 10.0,
+        "confidence": 90,
+        "content": "Raw milk procurement prices in the district currently average at \u20b935 per litre."
+    }
+]

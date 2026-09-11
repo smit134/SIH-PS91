@@ -1,5 +1,12 @@
 fastapi
 uvicorn
+sqlalchemy
+psycopg2-binary
+pgvector
+ollama
+pydantic-settings
+fastapi
+uvicorn
 pydantic
 pytest
 fastapi>=0.110.0
