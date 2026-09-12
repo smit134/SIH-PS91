@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.deps import get_current_user
 from app.core.spatial import haversine_distance_km
-from app.models.partner import PartnerProfile
+from app.models.partner import PartnerProfileModel
 from app.models.user import User
 from app.schemas.integration import PartnerMatchResponse
 
@@ -32,9 +32,9 @@ async def get_partner_recommendations(
 
     # Fetch active partner profiles excluding caller's own
     res = await db.execute(
-        select(PartnerProfile)
-        .where(PartnerProfile.user_id != current_user.id)
-        .where(PartnerProfile.is_looking_for_partner == True)
+        select(PartnerProfileModel)
+        .where(PartnerProfileModel.user_id != current_user.id)
+        .where(PartnerProfileModel.is_looking_for_partner == True)
         .limit(limit)
     )
     partners = res.scalars().all()

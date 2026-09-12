@@ -2,7 +2,7 @@
 
 import pytest
 from sqlalchemy import select
-from app.models.business import BusinessCategory
+from app.models.business import BusinessCategoryModel
 from app.models.scheme import GovernmentScheme
 from app.seed.seed_data import seed_business_categories, seed_government_schemes, seed_all
 
@@ -13,7 +13,7 @@ async def test_seed_business_categories(test_db_session):
     await seed_business_categories(test_db_session)
 
     # Verify categories exist
-    res = await test_db_session.execute(select(BusinessCategory))
+    res = await test_db_session.execute(select(BusinessCategoryModel))
     categories = res.scalars().all()
     codes = [c.code for c in categories]
     assert len(codes) >= 5
