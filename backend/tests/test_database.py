@@ -20,8 +20,8 @@ from app.models import (
     RiskTolerance,
     SkillProficiency,
     ResourceType,
-    BusinessCategory,
-    PartnerProfile,
+    BusinessCategoryModel,
+    PartnerProfileModel,
     PartnerMatch,
     PartnerVerificationStatus,
     MatchStatus,
@@ -128,8 +128,8 @@ def test_skills_and_user_skills(db_session: Session):
 
 
 def test_business_category_model(db_session: Session):
-    """Verifies BusinessCategory creation and attribute storage."""
-    category = BusinessCategory(
+    """Verifies BusinessCategoryModel creation and attribute storage."""
+    category = BusinessCategoryModel(
         name="Handicraft & Textile Production",
         code="HANDICRAFT_TEXTILE",
         description="Traditional rural handloom and textile manufacturing unit.",
@@ -146,7 +146,7 @@ def test_business_category_model(db_session: Session):
     db_session.add(category)
     db_session.commit()
 
-    fetched = db_session.query(BusinessCategory).filter_by(code="HANDICRAFT_TEXTILE").first()
+    fetched = db_session.query(BusinessCategoryModel).filter_by(code="HANDICRAFT_TEXTILE").first()
     assert fetched is not None
     assert fetched.min_capital == 30000
     assert "Weaving" in fetched.required_skills
@@ -160,7 +160,7 @@ def test_partner_profile_and_match(db_session: Session):
     db_session.add_all([user1, user2])
     db_session.commit()
 
-    partner_profile = PartnerProfile(
+    partner_profile = PartnerProfileModel(
         user_id=user2.id,
         investment_capacity_min=50000,
         investment_capacity_max=200000,

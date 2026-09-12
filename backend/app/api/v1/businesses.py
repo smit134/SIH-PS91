@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.deps import get_current_user
-from app.models.business import BusinessCategory
+from app.models.business import BusinessCategoryModel
 from app.models.user import User
 from app.schemas.integration import BusinessRecommendationResponse
 
@@ -26,7 +26,7 @@ async def get_business_recommendations(
     Handshake contract for Aishwarya's AI Feasibility Engine.
     """
     user_capital = current_user.profile.available_capital if current_user.profile else 0
-    res = await db.execute(select(BusinessCategory).limit(limit))
+    res = await db.execute(select(BusinessCategoryModel).limit(limit))
     categories = res.scalars().all()
 
     recommendations: List[BusinessRecommendationResponse] = []

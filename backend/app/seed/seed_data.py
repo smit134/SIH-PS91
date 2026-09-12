@@ -6,7 +6,7 @@ from typing import Dict, List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.business import BusinessCategory
+from app.models.business import BusinessCategoryModel
 from app.models.scheme import GovernmentScheme
 
 SEED_DIR = Path(__file__).parent
@@ -21,10 +21,10 @@ async def seed_business_categories(db: AsyncSession) -> int:
     inserted_count = 0
     for cat_dict in categories_data:
         existing = await db.execute(
-            select(BusinessCategory).where(BusinessCategory.code == cat_dict["code"])
+            select(BusinessCategoryModel).where(BusinessCategoryModel.code == cat_dict["code"])
         )
         if not existing.scalar_one_or_none():
-            category = BusinessCategory(**cat_dict)
+            category = BusinessCategoryModel(**cat_dict)
             db.add(category)
             inserted_count += 1
 

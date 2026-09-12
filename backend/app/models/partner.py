@@ -103,7 +103,7 @@ class MatchStatus(str, enum.Enum):
     REJECTED = "REJECTED"
 
 
-class PartnerProfile(Base):
+class PartnerProfileModel(Base):
     """Listing information for entrepreneurs seeking complementary business partners."""
 
     __tablename__ = "partner_profiles"

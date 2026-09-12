@@ -96,7 +96,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class BusinessCategory(Base):
+class BusinessCategoryModel(Base):
     """Benchmarked business templates (Handicraft, Dairy, Food Processing, etc.)."""
 
     __tablename__ = "business_categories"

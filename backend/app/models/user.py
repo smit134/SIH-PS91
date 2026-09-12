@@ -64,7 +64,7 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.profile import Profile
-    from app.models.partner import PartnerProfile
+    from app.models.partner import PartnerProfileModel
     from app.models.audit import AuditLog
 
 
@@ -124,8 +124,8 @@ class User(Base):
         uselist=False,
         cascade="all, delete-orphan",
     )
-    partner_profile: Mapped[Optional["PartnerProfile"]] = relationship(
-        "PartnerProfile",
+    partner_profile: Mapped[Optional["PartnerProfileModel"]] = relationship(
+        "PartnerProfileModel",
         back_populates="user",
         uselist=False,
         cascade="all, delete-orphan",
