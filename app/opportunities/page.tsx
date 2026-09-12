@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import EvidenceBadge from "@/components/EvidenceBadge";
-import { Compass, Sparkles, Filter, ArrowUpRight, Loader2, CheckCircle2, AlertTriangle, X } from "lucide-react";
+import { Compass, Sparkles, Filter, ArrowUpRight, Loader2, CheckCircle2, AlertTriangle, X, Landmark } from "lucide-react";
 import Link from "next/link";
 
 export default function OpportunitiesPage() {
@@ -139,13 +139,16 @@ export default function OpportunitiesPage() {
                 </div>
 
                 <div className="mt-4 flex items-center justify-between pt-3 border-t border-slate-100">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600">
-                    <span className="w-2 h-2 rounded-full bg-brand-500" />
-                    <span>Eligible for Credit Subsidy</span>
-                  </div>
+                  <Link
+                    href={`/schemes?opportunity=${opp.business_id || opp.id || ''}`}
+                    className="flex items-center gap-1 text-xs text-brand-700 hover:text-brand-900 font-semibold group/sub hover:underline"
+                  >
+                    <Landmark className="w-3.5 h-3.5 text-brand-600 shrink-0" />
+                    <span>Matched Schemes &rarr;</span>
+                  </Link>
                   <button
                     onClick={() => setSelectedOpp(opp)}
-                    className="flex items-center gap-1 text-xs font-bold text-brand-700 hover:text-brand-800 group-hover:translate-x-0.5 transition-transform"
+                    className="flex items-center gap-1 text-xs font-bold text-slate-700 hover:text-brand-800 group-hover:translate-x-0.5 transition-transform"
                   >
                     <span>Evaluate Details</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -206,20 +209,29 @@ export default function OpportunitiesPage() {
               )}
             </div>
 
-            <div className="p-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-              <button 
-                onClick={() => setSelectedOpp(null)}
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
-              >
-                Close
-              </button>
+            <div className="p-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between flex-wrap gap-3">
               <Link 
-                href={`/finance?business_id=${selectedOpp.business_id}`}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-bold hover:bg-brand-700 shadow-glow-teal transition-all"
+                href={`/schemes?opportunity=${selectedOpp.business_id || selectedOpp.id || ''}`}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-brand-300 bg-brand-50 text-brand-800 text-xs font-bold hover:bg-brand-100 transition-colors"
               >
-                <span>Run Financial Simulation</span>
-                <ArrowUpRight className="w-4 h-4" />
+                <Landmark className="w-3.5 h-3.5 text-brand-700" />
+                <span>View Matched Schemes</span>
               </Link>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setSelectedOpp(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
+                >
+                  Close
+                </button>
+                <Link 
+                  href="/finance" 
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 shadow-glow-teal transition-all"
+                >
+                  <span>Simulation</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>

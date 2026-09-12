@@ -28,14 +28,8 @@ export default function ProfilePage() {
           console.error("Failed to parse profile", e);
         }
       }
-    };
-
-    updateProfileData();
-    window.addEventListener("profileUpdated", updateProfileData);
-    return () => window.removeEventListener("profileUpdated", updateProfileData);
-  }, []);
-
-  const handleLogout = () => {
+    }
+  }, []);  const handleLogout = () => {
     localStorage.removeItem("thinkforge_token");
     localStorage.removeItem("thinkforge_name");
     localStorage.removeItem("thinkforge_profile");
