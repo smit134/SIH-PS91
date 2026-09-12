@@ -9,7 +9,7 @@ import {
   TrendingUp,
   IndianRupee,
   Compass,
-  Users2,
+  Handshake,
   ShieldCheck,
   CheckCircle2,
   Clock,
@@ -26,20 +26,80 @@ import {
 export default function DashboardPage() {
   const [profile, setProfile] = React.useState<any>(null);
   const [userName, setUserName] = React.useState<string>("Rural Entrepreneur");
+  const [partnerCount, setPartnerCount] = React.useState<number | null>(null);
+  const [partnerSubtext, setPartnerSubtext] = React.useState<string>("Scanning local network...");
 
   React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem("thinkforge_profile");
-      if (stored) {
-        setProfile(JSON.parse(stored));
+    const updateDashboardProfile = () => {
+      try {
+        const stored = localStorage.getItem("thinkforge_profile");
+        let parsedProfile = null;
+        if (stored) {
+          parsedProfile = JSON.parse(stored);
+          setProfile(parsedProfile);
+        }
+        const name = localStorage.getItem("thinkforge_name");
+        if (name) {
+          setUserName(name);
+        }
+
+        // Fetch partners to match the partner section
+        const rawProfile = parsedProfile || {};
+        const mappedProfile = {
+          user_id: "demo_user",
+          name: "Rural Entrepreneur",
+          available_capital: rawProfile.ownEquity ? parseInt(rawProfile.ownEquity.replace(/[^0-9]/g, "")) : 150000,
+          skills: [rawProfile.primarySkill || "Agri-Processing"],
+          experience_years: 2.0,
+          resources: [rawProfile.landAccess || "Owned", rawProfile.powerSupply || "3-Phase"],
+          interests: [rawProfile.sectorInterest || "Post-Harvest"],
+          location: {
+            latitude: 20.7453,
+            longitude: 78.6022,
+            village_or_town: rawProfile.block || "Deoli",
+            district: rawProfile.district || "Wardha",
+            state: rawProfile.state || "Maharashtra",
+            service_radius_km: 15.0
+          },
+          risk_preference: "Medium",
+          has_transport_access: !!rawProfile.transportVehicle,
+          has_market_connections: false,
+          has_digital_tools: true
+        };
+
+        fetch("http://localhost:8000/api/intelligence/partner/recommendations?max_radius_km=50", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(mappedProfile)
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setPartnerCount(data.length);
+              const types = data.map(p => {
+                if (p.investment_range_str) {
+                  // Keep it short, e.g., "₹1.0L-₹3.0L" -> "Partner" or just use name suffix
+                  if (p.investment_range_str.includes("₹")) return p.type || "Local Partner";
+                  return p.investment_range_str;
+                }
+                return p.type || "Local Partner";
+              });
+              const counts: Record<string, number> = {};
+              types.forEach(t => counts[t] = (counts[t] || 0) + 1);
+              const summary = Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(", ");
+              setPartnerSubtext(summary || "Local connections found");
+            }
+          })
+          .catch(e => console.error("Failed to fetch dashboard partners", e));
+
+      } catch (e) {
+        console.error(e);
       }
-      const name = localStorage.getItem("thinkforge_name");
-      if (name) {
-        setUserName(name);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    };
+
+    updateDashboardProfile();
+    window.addEventListener("profileUpdated", updateDashboardProfile);
+    return () => window.removeEventListener("profileUpdated", updateDashboardProfile);
   }, []);
 
   const kpiData = [
@@ -72,11 +132,11 @@ export default function DashboardPage() {
     },
     {
       title: "Potential Partners",
-      value: "7 Matched",
-      subtext: "3 FPOs, 2 Cold Stores, 2 SHGs",
-      trend: profile ? `Within ${profile.mandiDistance}` : "All within 20km radius",
+      value: partnerCount !== null ? `${partnerCount} Matched` : "7 Matched",
+      subtext: partnerCount !== null ? partnerSubtext : "3 FPOs, 2 Cold Stores, 2 SHGs",
+      trend: profile && profile.mandiDistance ? `Within ${profile.mandiDistance}` : "All within 20km radius",
       evidence: "VERIFIED" as const,
-      icon: Users2,
+      icon: Handshake,
       accent: "text-blue-600 bg-blue-50 border-blue-200/80",
     },
     {
