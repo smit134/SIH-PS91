@@ -316,7 +316,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Placeholder 3: Local Insights (Map) */}
+        {/* Placeholder 3: Local Insights (Map) */ }
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-card flex flex-col">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
