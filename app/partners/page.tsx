@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import EvidenceBadge from "@/components/EvidenceBadge";
-import { Users2, MapPin, Handshake, ShieldCheck, PhoneCall, Loader2 } from "lucide-react";
+import { MapPin, Handshake, ShieldCheck, PhoneCall, Loader2 } from "lucide-react";
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<any[]>([]);
@@ -89,7 +89,7 @@ export default function PartnersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-brand-700">
-            <Users2 className="w-4 h-4 text-brand-600" />
+            <Handshake className="w-4 h-4 text-brand-600" />
             <span>PARTNER ECOSYSTEM</span>
             <span className="text-slate-300">•</span>
             <span className="text-slate-500">Capability Complementarity</span>

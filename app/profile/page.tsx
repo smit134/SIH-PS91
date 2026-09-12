@@ -12,21 +12,27 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    const storedName = localStorage.getItem("thinkforge_name");
-    if (storedName) {
-      setName(storedName);
-    } else {
-      setName("Rural Entrepreneur");
-    }
-
-    const storedProfileStr = localStorage.getItem("thinkforge_profile");
-    if (storedProfileStr) {
-      try {
-        setProfile(JSON.parse(storedProfileStr));
-      } catch (e) {
-        console.error("Failed to parse profile", e);
+    const updateProfileData = () => {
+      const storedName = localStorage.getItem("thinkforge_name");
+      if (storedName) {
+        setName(storedName);
+      } else {
+        setName("Rural Entrepreneur");
       }
-    }
+
+      const storedProfileStr = localStorage.getItem("thinkforge_profile");
+      if (storedProfileStr) {
+        try {
+          setProfile(JSON.parse(storedProfileStr));
+        } catch (e) {
+          console.error("Failed to parse profile", e);
+        }
+      }
+    };
+
+    updateProfileData();
+    window.addEventListener("profileUpdated", updateProfileData);
+    return () => window.removeEventListener("profileUpdated", updateProfileData);
   }, []);
 
   const handleLogout = () => {

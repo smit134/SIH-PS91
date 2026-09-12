@@ -143,6 +143,8 @@ export default function RegisterPage() {
             body: JSON.stringify(formData)
           });
         }
+        
+        window.dispatchEvent(new Event("profileUpdated"));
       }
     } catch (err) {
       console.error("Failed to save profile", err);
