@@ -20,6 +20,7 @@ from app.routers.partner import router as partner_router
 from app.routers.geospatial import router as geospatial_router
 from app.routers.finance import router as old_finance_router
 from app.routers.schemes import router as schemes_router
+from app.routers.users import router as users_router
 
 # Configure structured logging
 logging.basicConfig(
@@ -29,10 +30,18 @@ logging.basicConfig(
 logger = logging.getLogger("thinkforge.main")
 
 
+from app.core.database import get_engine, Base
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manages application startup and shutdown lifecycle."""
     logger.info(f"Starting {settings.PROJECT_NAME} v{settings.VERSION} [{settings.ENVIRONMENT}]")
+    
+    # Ensure database tables exist
+    engine = get_engine()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+        
     yield
     logger.info(f"Shutting down {settings.PROJECT_NAME}")
 
@@ -70,6 +79,7 @@ def create_application() -> FastAPI:
     app.include_router(geospatial_router)
     app.include_router(old_finance_router)
     app.include_router(schemes_router)
+    app.include_router(users_router)
 
     @app.get(
         "/health",

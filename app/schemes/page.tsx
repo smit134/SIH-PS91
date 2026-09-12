@@ -13,6 +13,7 @@ export default function SchemesPage() {
       evidence: "VERIFIED" as const,
       status: "Eligible for Instant Application",
       description: "Credit-linked subsidy scheme offering 35% margin money assistance for rural micro-enterprises under MoSJE priority category.",
+      url: "https://www.kviconline.gov.in/pmegpeportal/pmegphome/index.jsp",
     },
     {
       title: "PMFME (PM Formalisation of Micro Food Processing Enterprises)",
@@ -23,6 +24,7 @@ export default function SchemesPage() {
       evidence: "VERIFIED" as const,
       status: "Cluster Aligned (Wardha Citrus & Pulses)",
       description: "Provides financial, technical, and business support for the upgradation of existing and new micro-food processing units.",
+      url: "https://pmfme.mofpi.gov.in/",
     },
     {
       title: "Venture Capital Fund for Scheduled Castes / OBCs (VCF-SC/BC)",
@@ -33,6 +35,7 @@ export default function SchemesPage() {
       evidence: "VERIFIED" as const,
       status: "MoSJE Direct Channel",
       description: "Concessional financing and incubation support for first-generation marginalized rural innovators and micro-manufacturers.",
+      url: "https://vcfsc.in/",
     },
   ];
 
@@ -79,10 +82,15 @@ export default function SchemesPage() {
                 <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                   {scheme.eligibilityMatch}
                 </span>
-                <button className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-brand-700 transition-colors">
+                <a 
+                  href={scheme.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-brand-700 transition-colors"
+                >
                   <span>View Guidelines</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+                </a>
               </div>
             </div>
 

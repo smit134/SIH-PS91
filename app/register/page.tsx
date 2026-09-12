@@ -18,7 +18,8 @@ import {
 import clsx from "clsx";
 
 interface FormData {
-  // Step 1: Location
+  // Step 1: Location & Profile
+  name: string;
   state: string;
   district: string;
   block: string;
@@ -48,24 +49,46 @@ interface FormData {
   paybackExpectation: string;
 }
 
+const locationData: Record<string, Record<string, string[]>> = {
+  Maharashtra: {
+    Wardha: ["Deoli Gram Panchayat", "Seloo", "Hinganghat", "Arvi"],
+    Nagpur: ["Kamptee", "Hingna", "Katol"],
+    Pune: ["Haveli", "Khed", "Maval"],
+    Nashik: ["Malegaon", "Sinnar", "Igatpuri"]
+  },
+  Gujarat: {
+    Ahmedabad: ["Sanand", "Daskroi", "Bavla"],
+    Surat: ["Olpad", "Mangrol", "Mandvi"]
+  },
+  Karnataka: {
+    Bengaluru: ["Anekal", "Yelahanka", "Kengeri"],
+    Mysuru: ["Hunsur", "Nanjangud", "T Narsipur"]
+  },
+  "Madhya Pradesh": {
+    Indore: ["Mhow", "Sanwer", "Depalpur"],
+    Bhopal: ["Huzur", "Berasia"]
+  }
+};
+
 const initialFormData: FormData = {
-  state: "Maharashtra",
-  district: "Wardha",
-  block: "Deoli Gram Panchayat",
-  mandiDistance: "14 km (Within APMC radius)",
-  primarySkill: "Agri-Processing & Solar Operations",
-  experienceYears: "4 - 7 Years",
-  isShgMember: true,
-  ownEquity: "₹1,50,000",
-  borrowingWillingness: "₹2,00,000",
+  name: "",
+  state: "",
+  district: "",
+  block: "",
+  mandiDistance: "",
+  primarySkill: "",
+  experienceYears: "",
+  isShgMember: false,
+  ownEquity: "",
+  borrowingWillingness: "",
   hasCollateral: false,
-  sectorInterest: "Post-Harvest Cold Chain & Food Value-Add",
-  operatingModel: "Hybrid (Solo with SHG Tie-Up)",
-  landAccess: "Owned Agricultural Shed (800 sq.ft)",
-  powerSupply: "3-Phase Rural Grid (18 hrs/day)",
-  transportVehicle: "Shared Auto-Trolley Access",
-  riskAppetite: "Moderate (Capital Preserving with Steady Cashflow)",
-  paybackExpectation: "12 - 18 Months",
+  sectorInterest: "",
+  operatingModel: "",
+  landAccess: "",
+  powerSupply: "",
+  transportVehicle: "",
+  riskAppetite: "",
+  paybackExpectation: "",
 };
 
 const steps = [
@@ -103,14 +126,26 @@ export default function RegisterPage() {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setIsSubmitting(true);
     try {
       if (typeof window !== "undefined") {
         localStorage.setItem("thinkforge_profile", JSON.stringify(formData));
+        if (formData.name) {
+          localStorage.setItem("thinkforge_name", formData.name);
+        }
+        
+        const userId = localStorage.getItem("thinkforge_token");
+        if (userId) {
+          await fetch(`http://localhost:8000/users/${userId}/profile`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+          });
+        }
       }
-    } catch {
-      // ignore storage err
+    } catch (err) {
+      console.error("Failed to save profile", err);
     }
 
     setTimeout(() => {
@@ -215,36 +250,68 @@ export default function RegisterPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">State</label>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">Full Name</label>
                 <input
                   type="text"
-                  value={formData.state}
-                  onChange={(e) => updateField("state", e.target.value)}
+                  placeholder="Enter your name"
+                  value={formData.name}
+                  onChange={(e) => updateField("name", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">District</label>
-                <input
-                  type="text"
-                  value={formData.district}
-                  onChange={(e) => updateField("district", e.target.value)}
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">State</label>
+                <select
+                  value={formData.state}
+                  onChange={(e) => {
+                    updateField("state", e.target.value);
+                    updateField("district", "");
+                    updateField("block", "");
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
-                />
+                >
+                  <option value="">Select State...</option>
+                  {Object.keys(locationData).map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">District</label>
+                <select
+                  value={formData.district}
+                  onChange={(e) => {
+                    updateField("district", e.target.value);
+                    updateField("block", "");
+                  }}
+                  disabled={!formData.state}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none disabled:opacity-50"
+                >
+                  <option value="">Select District...</option>
+                  {formData.state && locationData[formData.state] && Object.keys(locationData[formData.state]).map(district => (
+                    <option key={district} value={district}>{district}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1.5">
                   Block / Gram Panchayat
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.block}
                   onChange={(e) => updateField("block", e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
-                />
+                  disabled={!formData.district}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none disabled:opacity-50"
+                >
+                  <option value="">Select Block...</option>
+                  {formData.state && formData.district && locationData[formData.state]?.[formData.district]?.map(block => (
+                    <option key={block} value={block}>{block}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -256,10 +323,11 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("mandiDistance", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>Under 5 km (Immediate Mandi Access)</option>
-                  <option>5 - 15 km (Semi-Peripheral)</option>
-                  <option>15 - 30 km (Rural Deep)</option>
-                  <option>Above 30 km (Remote Outlier)</option>
+                  <option value="">Select Distance...</option>
+                  <option value="Under 5 km (Immediate Mandi Access)">Under 5 km (Immediate Mandi Access)</option>
+                  <option value="5 - 15 km (Semi-Peripheral)">5 - 15 km (Semi-Peripheral)</option>
+                  <option value="15 - 30 km (Rural Deep)">15 - 30 km (Rural Deep)</option>
+                  <option value="Above 30 km (Remote Outlier)">Above 30 km (Remote Outlier)</option>
                 </select>
               </div>
             </div>
@@ -291,12 +359,13 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("primarySkill", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>Agri-Processing & Solar Operations</option>
-                  <option>Food Preservation & Pickling/Pulses</option>
-                  <option>Electrical, Solar & Pump Repair</option>
-                  <option>Dairy Chilling & Milk Aggregation</option>
-                  <option>Handloom & Natural Fiber Weaving</option>
-                  <option>Mechanical Fabrication & Metalwork</option>
+                  <option value="">Select Skill...</option>
+                  <option value="Agri-Processing & Solar Operations">Agri-Processing & Solar Operations</option>
+                  <option value="Food Preservation & Pickling/Pulses">Food Preservation & Pickling/Pulses</option>
+                  <option value="Electrical, Solar & Pump Repair">Electrical, Solar & Pump Repair</option>
+                  <option value="Dairy Chilling & Milk Aggregation">Dairy Chilling & Milk Aggregation</option>
+                  <option value="Handloom & Natural Fiber Weaving">Handloom & Natural Fiber Weaving</option>
+                  <option value="Mechanical Fabrication & Metalwork">Mechanical Fabrication & Metalwork</option>
                 </select>
               </div>
 
@@ -310,10 +379,11 @@ export default function RegisterPage() {
                     onChange={(e) => updateField("experienceYears", e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                   >
-                    <option>Beginner (0 - 1 Year)</option>
-                    <option>1 - 3 Years</option>
-                    <option>4 - 7 Years</option>
-                    <option>8+ Years (Master Practitioner)</option>
+                    <option value="">Select Experience...</option>
+                    <option value="Beginner (0 - 1 Year)">Beginner (0 - 1 Year)</option>
+                    <option value="1 - 3 Years">1 - 3 Years</option>
+                    <option value="4 - 7 Years">4 - 7 Years</option>
+                    <option value="8+ Years (Master Practitioner)">8+ Years (Master Practitioner)</option>
                   </select>
                 </div>
 
@@ -378,11 +448,12 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("ownEquity", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>₹50,000 (Micro Bootstrap)</option>
-                  <option>₹1,00,000</option>
-                  <option>₹1,50,000</option>
-                  <option>₹2,50,000</option>
-                  <option>₹5,00,000+</option>
+                  <option value="">Select Amount...</option>
+                  <option value="₹50,000 (Micro Bootstrap)">₹50,000 (Micro Bootstrap)</option>
+                  <option value="₹1,00,000">₹1,00,000</option>
+                  <option value="₹1,50,000">₹1,50,000</option>
+                  <option value="₹2,50,000">₹2,50,000</option>
+                  <option value="₹5,00,000+">₹5,00,000+</option>
                 </select>
               </div>
 
@@ -395,10 +466,11 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("borrowingWillingness", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>₹1,00,000 (Low Debt Burden)</option>
-                  <option>₹2,00,000</option>
-                  <option>₹3,50,000 (PMEGP Band)</option>
-                  <option>₹5,00,000+</option>
+                  <option value="">Select Amount...</option>
+                  <option value="₹1,00,000 (Low Debt Burden)">₹1,00,000 (Low Debt Burden)</option>
+                  <option value="₹2,00,000">₹2,00,000</option>
+                  <option value="₹3,50,000 (PMEGP Band)">₹3,50,000 (PMEGP Band)</option>
+                  <option value="₹5,00,000+">₹5,00,000+</option>
                 </select>
               </div>
             </div>
@@ -465,11 +537,12 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("sectorInterest", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>Post-Harvest Cold Chain & Food Value-Add</option>
-                  <option>Bio-Waste Briquette & Renewable Energy</option>
-                  <option>Dairy Value Added Products (Ghee, Paneer)</option>
-                  <option>Agro-Textile & Natural Fiber Extraction</option>
-                  <option>Rural Last-Mile Logistics & Hub</option>
+                  <option value="">Select Sector...</option>
+                  <option value="Post-Harvest Cold Chain & Food Value-Add">Post-Harvest Cold Chain & Food Value-Add</option>
+                  <option value="Bio-Waste Briquette & Renewable Energy">Bio-Waste Briquette & Renewable Energy</option>
+                  <option value="Dairy Value Added Products (Ghee, Paneer)">Dairy Value Added Products (Ghee, Paneer)</option>
+                  <option value="Agro-Textile & Natural Fiber Extraction">Agro-Textile & Natural Fiber Extraction</option>
+                  <option value="Rural Last-Mile Logistics & Hub">Rural Last-Mile Logistics & Hub</option>
                 </select>
               </div>
 
@@ -482,10 +555,11 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("operatingModel", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>Hybrid (Solo with SHG Tie-Up)</option>
-                  <option>Individual Sole Proprietorship</option>
-                  <option>Co-operative / FPO Joint Venture</option>
-                  <option>Family Partnership Unit</option>
+                  <option value="">Select Model...</option>
+                  <option value="Hybrid (Solo with SHG Tie-Up)">Hybrid (Solo with SHG Tie-Up)</option>
+                  <option value="Individual Sole Proprietorship">Individual Sole Proprietorship</option>
+                  <option value="Co-operative / FPO Joint Venture">Co-operative / FPO Joint Venture</option>
+                  <option value="Family Partnership Unit">Family Partnership Unit</option>
                 </select>
               </div>
             </div>
@@ -517,10 +591,11 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("landAccess", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>Owned Agricultural Shed (800 sq.ft)</option>
-                  <option>Open Land Plot (Need to Erect Shed)</option>
-                  <option>Rented Village Facility</option>
-                  <option>No Land (Need Common Facility Center)</option>
+                  <option value="">Select Land Access...</option>
+                  <option value="Owned Agricultural Shed (800 sq.ft)">Owned Agricultural Shed (800 sq.ft)</option>
+                  <option value="Open Land Plot (Need to Erect Shed)">Open Land Plot (Need to Erect Shed)</option>
+                  <option value="Rented Village Facility">Rented Village Facility</option>
+                  <option value="No Land (Need Common Facility Center)">No Land (Need Common Facility Center)</option>
                 </select>
               </div>
 
@@ -534,10 +609,11 @@ export default function RegisterPage() {
                     onChange={(e) => updateField("powerSupply", e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                   >
-                    <option>3-Phase Rural Grid (18 hrs/day)</option>
-                    <option>Single-Phase Domestic Connection</option>
-                    <option>Solar Hybrid Feeder Available</option>
-                    <option>Frequent Outages / Off-Grid</option>
+                    <option value="">Select Power Status...</option>
+                    <option value="3-Phase Rural Grid (18 hrs/day)">3-Phase Rural Grid (18 hrs/day)</option>
+                    <option value="Single-Phase Domestic Connection">Single-Phase Domestic Connection</option>
+                    <option value="Solar Hybrid Feeder Available">Solar Hybrid Feeder Available</option>
+                    <option value="Frequent Outages / Off-Grid">Frequent Outages / Off-Grid</option>
                   </select>
                 </div>
 
@@ -550,10 +626,11 @@ export default function RegisterPage() {
                     onChange={(e) => updateField("transportVehicle", e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                   >
-                    <option>Shared Auto-Trolley Access</option>
-                    <option>Own Mini-Pickup Truck</option>
-                    <option>Motorcycle / Moped Only</option>
-                    <option>Rely on Third-Party Logistics</option>
+                    <option value="">Select Transport...</option>
+                    <option value="Shared Auto-Trolley Access">Shared Auto-Trolley Access</option>
+                    <option value="Own Mini-Pickup Truck">Own Mini-Pickup Truck</option>
+                    <option value="Motorcycle / Moped Only">Motorcycle / Moped Only</option>
+                    <option value="Rely on Third-Party Logistics">Rely on Third-Party Logistics</option>
                   </select>
                 </div>
               </div>
@@ -586,9 +663,10 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("riskAppetite", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>Moderate (Capital Preserving with Steady Cashflow)</option>
-                  <option>Conservative (Minimal Debt, Subsidy-Anchored)</option>
-                  <option>Aggressive / Growth-Oriented (High Scale)</option>
+                  <option value="">Select Risk Profile...</option>
+                  <option value="Moderate (Capital Preserving with Steady Cashflow)">Moderate (Capital Preserving with Steady Cashflow)</option>
+                  <option value="Conservative (Minimal Debt, Subsidy-Anchored)">Conservative (Minimal Debt, Subsidy-Anchored)</option>
+                  <option value="Aggressive / Growth-Oriented (High Scale)">Aggressive / Growth-Oriented (High Scale)</option>
                 </select>
               </div>
 
@@ -601,9 +679,10 @@ export default function RegisterPage() {
                   onChange={(e) => updateField("paybackExpectation", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option>6 - 12 Months (Fast Cash Recovery)</option>
-                  <option>12 - 18 Months (Standard Agro-Cycle)</option>
-                  <option>18 - 24 Months (Asset Heavy)</option>
+                  <option value="">Select Horizon...</option>
+                  <option value="6 - 12 Months (Fast Cash Recovery)">6 - 12 Months (Fast Cash Recovery)</option>
+                  <option value="12 - 18 Months (Standard Agro-Cycle)">12 - 18 Months (Standard Agro-Cycle)</option>
+                  <option value="18 - 24 Months (Asset Heavy)">18 - 24 Months (Asset Heavy)</option>
                 </select>
               </div>
 

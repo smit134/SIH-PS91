@@ -204,13 +204,34 @@ class OpportunityEngine:
             w.risk_suitability * risk_suit,
             1
         )
-        overall_fit = max(0.0, min(100.0, composite_score))
+        
+        # Interest match bonus
+        interest_bonus = 0.0
+        matched_interests = []
+        if profile.interests:
+            b_sector = business.sector.lower()
+            b_name = business.name.lower()
+            b_tags = [t.lower() for t in business.tags]
+            
+            for ui in profile.interests:
+                if not ui: continue
+                ui_words = [w for w in ui.lower().replace('&', ' ').replace('-', ' ').split() if len(w) > 3]
+                
+                for word in ui_words:
+                    if word in b_sector or word in b_name or any(word in t for t in b_tags):
+                        interest_bonus += 15.0
+                        matched_interests.append(ui)
+                        break
+
+        overall_fit = max(0.0, min(100.0, composite_score + interest_bonus))
 
         # 4. Explainability Generation (Section 8)
         why_recommended = []
         why_not_perfect = []
         why_not_this_business = []
 
+        if matched_interests:
+            why_recommended.append(f"Direct match with your stated interest: {matched_interests[0]}.")
         if skill_fit >= 75.0:
             why_recommended.append(f"Strong skill alignment: {', '.join(matched_skills[:2]) or 'Direct artisanal skills'} already available.")
         if cap_fit >= 80.0:
