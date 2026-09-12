@@ -61,6 +61,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # External APIs
+    GEMINI_API_KEY: str = "redacted"
+
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/thinkforge"
     DB_POOL_SIZE: int = 10
