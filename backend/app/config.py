@@ -27,14 +27,7 @@ class PartnerSynergyWeights(BaseModel):
     experience_compatibility: float = Field(default=0.10, description="Experience Compatibility Weight (10%)")
 
 
-class EngineSettings:
-    DEFAULT_SERVICE_RADIUS_KM: float = 10.0
-    MAX_PARTNER_RADIUS_KM: float = 50.0
-    DEFAULT_OPPORTUNITY_WEIGHTS: OpportunityScoringWeights = OpportunityScoringWeights()
-    DEFAULT_SYNERGY_WEIGHTS: PartnerSynergyWeights = PartnerSynergyWeights()
 
-
-settings = EngineSettings()
 """ThinkForge Backend Configuration Module.
 
 Reads configuration from environment variables or .env file with safe defaults.
@@ -74,6 +67,12 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 20
     DB_POOL_TIMEOUT: int = 30
     DB_POOL_RECYCLE: int = 1800
+
+    # Engine Intelligence Settings
+    DEFAULT_SERVICE_RADIUS_KM: float = 10.0
+    MAX_PARTNER_RADIUS_KM: float = 50.0
+    DEFAULT_OPPORTUNITY_WEIGHTS: OpportunityScoringWeights = OpportunityScoringWeights()
+    DEFAULT_SYNERGY_WEIGHTS: PartnerSynergyWeights = PartnerSynergyWeights()
 
     # CORS Whitelist
     CORS_ORIGINS: List[str] = [

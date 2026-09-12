@@ -28,28 +28,28 @@ export default function LocalInsightsPage() {
             <EvidenceBadge type="VERIFIED" />
           </div>
 
-          <div className="my-5 aspect-[16/10] bg-slate-900 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between text-white">
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#2dd4bf_1px,transparent_1px)] [background-size:16px_16px]" />
-            <div className="relative z-10 flex items-center justify-between text-xs">
-              <span className="bg-slate-800/90 px-3 py-1 rounded-full border border-slate-700 font-mono">
+          <div className="my-5 aspect-[16/10] bg-slate-200 rounded-xl relative overflow-hidden flex flex-col shadow-inner">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://maps.google.com/maps?q=20.7453,78.6022&z=11&output=embed" 
+              frameBorder="0" 
+              style={{ border: 0, position: 'absolute', inset: 0 }} 
+              allowFullScreen 
+              title="Local Area Map"
+            />
+            
+            {/* Overlay Elements */}
+            <div className="relative z-10 flex items-center justify-between p-4 pointer-events-none">
+              <span className="bg-slate-900/90 text-white px-3 py-1.5 rounded-full border border-slate-700 font-mono text-xs shadow-lg backdrop-blur-sm">
                 Wardha Cluster • Lat 20.7453° N, 78.6022° E
               </span>
-              <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-semibold">
+              <span className="bg-emerald-500/90 text-white border border-emerald-400 px-3 py-1.5 rounded-full font-bold text-xs shadow-lg backdrop-blur-sm">
                 High Agro Density
               </span>
             </div>
 
-            <div className="relative z-10 text-center space-y-2 my-auto">
-              <div className="w-16 h-16 rounded-full bg-brand-500/20 border-2 border-brand-400 flex items-center justify-center mx-auto shadow-glow-teal animate-pulse">
-                <MapPinned className="w-8 h-8 text-emerald-300" />
-              </div>
-              <h4 className="text-lg font-bold text-white">Wardha Central Micro-Region</h4>
-              <p className="text-xs text-slate-300 max-w-md mx-auto">
-                Mandi Radius: 18km • 42 Cultivation Clusters • High unmet demand for post-harvest pre-sorting.
-              </p>
-            </div>
-
-            <div className="relative z-10 grid grid-cols-3 gap-2 text-center text-xs pt-3 border-t border-slate-800">
+            <div className="mt-auto relative z-10 grid grid-cols-3 gap-2 text-center text-xs p-4 bg-slate-900/90 backdrop-blur-md text-white border-t border-slate-800 pointer-events-none">
               <div>
                 <p className="text-slate-400 text-[10px]">APMC Mandi Arrival</p>
                 <p className="font-bold text-white">1,420 Quintals/Day</p>

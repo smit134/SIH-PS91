@@ -24,11 +24,29 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const [profile, setProfile] = React.useState<any>(null);
+  const [userName, setUserName] = React.useState<string>("Rural Entrepreneur");
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem("thinkforge_profile");
+      if (stored) {
+        setProfile(JSON.parse(stored));
+      }
+      const name = localStorage.getItem("thinkforge_name");
+      if (name) {
+        setUserName(name);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
   const kpiData = [
     {
       title: "Profile Readiness",
-      value: "78%",
-      subtext: "High Feasibility Tier • Tier 1 Verified",
+      value: profile ? "100%" : "78%",
+      subtext: profile ? "Profile Complete & Calibrated" : "High Feasibility Tier • Tier 1 Verified",
       trend: "+12% from initial intake",
       evidence: "DERIVED" as const,
       icon: TrendingUp,
@@ -36,8 +54,8 @@ export default function DashboardPage() {
     },
     {
       title: "Available Capital",
-      value: "₹2,50,000",
-      subtext: "₹1.50L Equity + ₹1.00L Eligible Credit",
+      value: profile?.ownEquity || "₹2,50,000",
+      subtext: profile ? `Equity + Eligible Credit` : "₹1.50L Equity + ₹1.00L Eligible Credit",
       trend: "31.2% Equity Leverage",
       evidence: "VERIFIED" as const,
       icon: IndianRupee,
@@ -46,7 +64,7 @@ export default function DashboardPage() {
     {
       title: "Recommended Opportunities",
       value: "4 Viable",
-      subtext: "Top: Solar Cold Sorting (89% Fit)",
+      subtext: profile ? `Top: ${profile.sectorInterest?.split(' ')[0]}...` : "Top: Solar Cold Sorting (89% Fit)",
       trend: "2 High Market Demand",
       evidence: "DERIVED" as const,
       icon: Compass,
@@ -56,7 +74,7 @@ export default function DashboardPage() {
       title: "Potential Partners",
       value: "7 Matched",
       subtext: "3 FPOs, 2 Cold Stores, 2 SHGs",
-      trend: "All within 20km radius",
+      trend: profile ? `Within ${profile.mandiDistance}` : "All within 20km radius",
       evidence: "VERIFIED" as const,
       icon: Users2,
       accent: "text-blue-600 bg-blue-50 border-blue-200/80",
@@ -103,7 +121,7 @@ export default function DashboardPage() {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Namaste, Ramesh Kumar 👋
+              Namaste, {userName} 👋
             </h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -211,27 +229,38 @@ export default function DashboardPage() {
           </div>
 
           {/* Structured Layout Placeholder with dashed border & clear label */}
-          <div className="flex-1 min-h-[260px] rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/70 p-6 flex flex-col items-center justify-center text-center transition-colors hover:border-brand-400">
-            <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-brand-600 shadow-sm mb-3">
-              <BarChart3 className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-bold tracking-wider uppercase text-slate-400">
-              [ Layout Placeholder ]
-            </span>
-            <h4 className="text-sm font-bold text-slate-800 mt-1">Top Opportunities (Chart)</h4>
-            <p className="text-xs text-slate-500 max-w-sm mt-1">
-              Comparative multi-variable chart displaying Capex vs. Payback Period vs. Viability Score for Wardha agro opportunities.
-            </p>
-            <div className="mt-4 flex items-center gap-2">
-              <span className="text-[10px] font-semibold bg-white border border-slate-200 px-2.5 py-1 rounded-lg text-slate-600">
-                Solar Cold Chain (89%)
-              </span>
-              <span className="text-[10px] font-semibold bg-white border border-slate-200 px-2.5 py-1 rounded-lg text-slate-600">
-                Briquette Plant (83%)
-              </span>
-              <span className="text-[10px] font-semibold bg-white border border-slate-200 px-2.5 py-1 rounded-lg text-slate-600">
-                Fiber Unit (78%)
-              </span>
+          <div className="flex-1 min-h-[260px] rounded-xl border border-slate-200 bg-white p-4 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Solar Cold Chain</p>
+                  <p className="text-[10px] text-slate-500">Highest viability match</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-bold text-emerald-600">89% Fit</p>
+                  <p className="text-[10px] text-slate-500">₹3.5L Capex</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Agri-Briquette Plant</p>
+                  <p className="text-[10px] text-slate-500">Strong market demand</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-bold text-brand-600">83% Fit</p>
+                  <p className="text-[10px] text-slate-500">₹2.2L Capex</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
+                <div>
+                  <p className="text-xs font-bold text-slate-900">Fiber Extraction Unit</p>
+                  <p className="text-[10px] text-slate-500">Niche rural sector</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-bold text-teal-600">78% Fit</p>
+                  <p className="text-[10px] text-slate-500">₹1.8L Capex</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -247,29 +276,41 @@ export default function DashboardPage() {
           </div>
 
           {/* Structured Layout Placeholder with dashed border & clear label */}
-          <div className="flex-1 min-h-[260px] rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/70 p-6 flex flex-col items-center justify-center text-center transition-colors hover:border-emerald-400">
-            <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-emerald-600 shadow-sm mb-3">
-              <Radar className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-bold tracking-wider uppercase text-slate-400">
-              [ Layout Placeholder ]
-            </span>
-            <h4 className="text-sm font-bold text-slate-800 mt-1">Capability Scorecard (Chart)</h4>
-            <p className="text-xs text-slate-500 max-w-sm mt-1">
-              Multi-dimensional spider/radar chart benchmarking Capital, Technical Skills, Infrastructure, Risk Resilience, and Market Channel Access.
-            </p>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-400 block">Financial</span>
+          <div className="flex-1 min-h-[260px] rounded-xl border border-slate-200 bg-white p-5 flex flex-col justify-center space-y-5">
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-semibold text-slate-700">Financial Capacity</span>
                 <span className="font-bold text-brand-700">82%</span>
               </div>
-              <div className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-400 block">Technical</span>
+              <div className="w-full bg-slate-100 rounded-full h-2">
+                <div className="bg-brand-500 h-2 rounded-full" style={{ width: '82%' }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-semibold text-slate-700">Technical Expertise</span>
                 <span className="font-bold text-emerald-700">75%</span>
               </div>
-              <div className="bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-400 block">Infra</span>
+              <div className="w-full bg-slate-100 rounded-full h-2">
+                <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '75%' }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-semibold text-slate-700">Infrastructure Assets</span>
                 <span className="font-bold text-teal-700">85%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2">
+                <div className="bg-teal-500 h-2 rounded-full" style={{ width: '85%' }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-semibold text-slate-700">Risk Resilience</span>
+                <span className="font-bold text-blue-700">60%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2">
+                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '60%' }}></div>
               </div>
             </div>
           </div>
@@ -292,26 +333,24 @@ export default function DashboardPage() {
           </div>
 
           {/* Structured Layout Placeholder with dashed border & clear label */}
-          <div className="flex-1 min-h-[260px] rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/70 p-6 flex flex-col items-center justify-center text-center transition-colors hover:border-teal-400">
-            <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-teal-600 shadow-sm mb-3">
-              <MapPinned className="w-6 h-6" />
-            </div>
-            <span className="text-xs font-bold tracking-wider uppercase text-slate-400">
-              [ Layout Placeholder ]
-            </span>
-            <h4 className="text-sm font-bold text-slate-800 mt-1">Local Insights (Map)</h4>
-            <p className="text-xs text-slate-500 max-w-sm mt-1">
-              Interactive Leaflet GIS map displaying APMC mandi catchment, crop surplus hot-spots, competitor density, and rural road connectivity.
-            </p>
-            <div className="mt-4 flex items-center gap-2 text-[11px] font-semibold text-slate-600">
+          <div className="flex-1 min-h-[260px] rounded-xl border border-slate-200 relative overflow-hidden flex flex-col">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              src="https://maps.google.com/maps?q=20.7453,78.6022&z=11&output=embed" 
+              frameBorder="0" 
+              style={{ border: 0, position: 'absolute', inset: 0 }} 
+              allowFullScreen 
+              title="Dashboard Local Area Map"
+            />
+            
+            <div className="mt-auto relative z-10 flex flex-wrap items-center justify-center gap-3 p-3 bg-white/90 backdrop-blur-md border-t border-slate-200 text-[10px] font-semibold text-slate-700 pointer-events-none">
               <span className="inline-flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" /> Mandi: 14km
               </span>
-              <span className="text-slate-300">•</span>
               <span className="inline-flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-blue-500" /> 3 FPOs Nearby
               </span>
-              <span className="text-slate-300">•</span>
               <span className="inline-flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-amber-500" /> Low Saturation
               </span>

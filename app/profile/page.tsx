@@ -1,9 +1,50 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import EvidenceBadge from "@/components/EvidenceBadge";
-import { UserCircle2, MapPin, Briefcase, Award, Shield, Edit3 } from "lucide-react";
+import { UserCircle2, MapPin, Briefcase, Award, Shield, Edit3, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const [name, setName] = useState("Loading...");
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const storedName = localStorage.getItem("thinkforge_name");
+    if (storedName) {
+      setName(storedName);
+    } else {
+      setName("Rural Entrepreneur");
+    }
+
+    const storedProfileStr = localStorage.getItem("thinkforge_profile");
+    if (storedProfileStr) {
+      try {
+        setProfile(JSON.parse(storedProfileStr));
+      } catch (e) {
+        console.error("Failed to parse profile", e);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("thinkforge_token");
+    localStorage.removeItem("thinkforge_name");
+    localStorage.removeItem("thinkforge_profile");
+    router.push("/auth");
+  };
+
+  const getInitials = (n: string) => {
+    if (!n || n === "Loading...") return "EN";
+    const parts = n.split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return n.slice(0, 2).toUpperCase();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -14,19 +55,28 @@ export default function ProfilePage() {
             <span className="text-slate-300">•</span>
             <span className="text-slate-500">Capability Dossier</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mt-1">Ramesh Kumar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mt-1">{name}</h1>
           <p className="text-sm text-slate-600">
-            Registered Micro-Entrepreneur • Wardha Agro-Processing Cluster • Readiness Score: 78%
+            Registered Micro-Entrepreneur • {profile ? `${profile.district || "Local"} Cluster` : "Loading..."} • Readiness Score: 78%
           </p>
         </div>
 
-        <Link
-          href="/register"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 shadow-glow-teal transition-all"
-        >
-          <Edit3 className="w-4 h-4 text-emerald-200" />
-          Update Capability Profile
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 shadow-glow-teal transition-all"
+          >
+            <Edit3 className="w-4 h-4 text-emerald-200" />
+            Update Capability Profile
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-red-600 text-white hover:bg-red-700 shadow-glow-red transition-all"
+          >
+            <LogOut className="w-4 h-4 text-white" />
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -34,10 +84,10 @@ export default function ProfilePage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-card space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-900 to-brand-950 text-emerald-400 font-bold text-2xl flex items-center justify-center ring-4 ring-emerald-500/20">
-              RK
+              {getInitials(name)}
             </div>
             <div>
-              <h3 className="font-bold text-lg text-slate-900">Ramesh Kumar</h3>
+              <h3 className="font-bold text-lg text-slate-900">{name}</h3>
               <p className="text-xs text-brand-700 font-semibold">Rural Micro-Entrepreneur</p>
               <div className="mt-1">
                 <EvidenceBadge type="VERIFIED" />
@@ -48,19 +98,27 @@ export default function ProfilePage() {
           <div className="pt-4 border-t border-slate-100 space-y-3 text-xs">
             <div>
               <span className="text-slate-400 block font-medium">Location</span>
-              <span className="font-semibold text-slate-800">Deoli Village, Wardha, Maharashtra</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? `${profile.block || "Unknown"}, ${profile.district || "Unknown"}, ${profile.state || "Unknown"}` : "Loading..."}
+              </span>
             </div>
             <div>
               <span className="text-slate-400 block font-medium">Target Sector</span>
-              <span className="font-semibold text-slate-800">Agri-Processing & Solar Cold Chain</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? profile.sectorInterest || "Not specified" : "Loading..."}
+              </span>
             </div>
             <div>
               <span className="text-slate-400 block font-medium">Available Equity</span>
-              <span className="font-semibold text-slate-800">₹1,50,000 (Savings + Family)</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? profile.ownEquity || "Not specified" : "Loading..."}
+              </span>
             </div>
             <div>
               <span className="text-slate-400 block font-medium">Risk Appetite</span>
-              <span className="font-semibold text-slate-800">Moderate / Capital-Preserving</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? profile.riskAppetite || "Not specified" : "Loading..."}
+              </span>
             </div>
           </div>
         </div>
