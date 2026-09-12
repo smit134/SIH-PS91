@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # -----------------------------------------------------------
   # PostGIS / PostgreSQL 16 Database

@@ -26,6 +26,7 @@ export default function AuthPage() {
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem("thinkforge_token", data.user_id);
+        localStorage.setItem("thinkforge_phone", phone);
         
         if (data.name) {
           localStorage.setItem("thinkforge_name", data.name);
@@ -49,7 +50,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+    <div className="w-full flex-1 flex items-center justify-center py-10 px-4">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-400 border border-brand-500/20 mb-4">
