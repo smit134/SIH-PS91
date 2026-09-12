@@ -214,7 +214,7 @@ export default function OpportunitiesPage() {
                 Close
               </button>
               <Link 
-                href="/finance" 
+                href={`/finance?business_id=${selectedOpp.business_id}`}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-bold hover:bg-brand-700 shadow-glow-teal transition-all"
               >
                 <span>Run Financial Simulation</span>

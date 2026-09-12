@@ -1,0 +1,32 @@
+[
+  {
+    "id": "scheme_pmegp",
+    "name": "Prime Minister's Employment Generation Programme (PMEGP)",
+    "description": "Credit-linked subsidy programme for generating employment opportunities through micro-enterprises.",
+    "subsidy_percentage": 25,
+    "max_project_cost": 5000000,
+    "target_sectors": ["Manufacturing", "Services", "Agri-Processing"],
+    "eligibility": "Age > 18, Min 8th Pass for projects > 10L",
+    "source_url": "https://www.kviconline.gov.in/pmegpeportal/"
+  },
+  {
+    "id": "scheme_pmfme",
+    "name": "PM Formalisation of Micro food processing Enterprises (PMFME)",
+    "description": "Financial, technical and business support for micro food processing enterprises.",
+    "subsidy_percentage": 35,
+    "max_project_cost": 3000000,
+    "target_sectors": ["Food Processing", "Agri-Processing"],
+    "eligibility": "Existing micro food processing units, FPOs, SHGs",
+    "source_url": "https://pmfme.mofpi.gov.in/"
+  },
+  {
+    "id": "scheme_mudra",
+    "name": "Pradhan Mantri MUDRA Yojana (PMMY)",
+    "description": "Loans up to 10 Lakhs to non-corporate, non-farm small/micro enterprises.",
+    "subsidy_percentage": 0,
+    "max_project_cost": 1000000,
+    "target_sectors": ["All"],
+    "eligibility": "Non-corporate small business segment",
+    "source_url": "https://www.mudra.org.in/"
+  }
+]
