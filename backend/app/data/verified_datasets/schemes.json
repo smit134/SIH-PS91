@@ -1,32 +1,319 @@
 [
-  {
-    "id": "scheme_pmegp",
-    "name": "Prime Minister's Employment Generation Programme (PMEGP)",
-    "description": "Credit-linked subsidy programme for generating employment opportunities through micro-enterprises.",
-    "subsidy_percentage": 25,
-    "max_project_cost": 5000000,
-    "target_sectors": ["Manufacturing", "Services", "Agri-Processing"],
-    "eligibility": "Age > 18, Min 8th Pass for projects > 10L",
-    "source_url": "https://www.kviconline.gov.in/pmegpeportal/"
-  },
-  {
-    "id": "scheme_pmfme",
-    "name": "PM Formalisation of Micro food processing Enterprises (PMFME)",
-    "description": "Financial, technical and business support for micro food processing enterprises.",
-    "subsidy_percentage": 35,
-    "max_project_cost": 3000000,
-    "target_sectors": ["Food Processing", "Agri-Processing"],
-    "eligibility": "Existing micro food processing units, FPOs, SHGs",
-    "source_url": "https://pmfme.mofpi.gov.in/"
-  },
-  {
-    "id": "scheme_mudra",
-    "name": "Pradhan Mantri MUDRA Yojana (PMMY)",
-    "description": "Loans up to 10 Lakhs to non-corporate, non-farm small/micro enterprises.",
-    "subsidy_percentage": 0,
-    "max_project_cost": 1000000,
-    "target_sectors": ["All"],
-    "eligibility": "Non-corporate small business segment",
-    "source_url": "https://www.mudra.org.in/"
-  }
+    {
+        "id": "scheme_pmegp",
+        "name": "Prime Minister's Employment Generation Programme (PMEGP)",
+        "description": "Credit-linked subsidy programme for generating employment opportunities through micro-enterprises.",
+        "subsidy_percentage": 25,
+        "max_project_cost": 5000000,
+        "target_sectors": [
+            "Manufacturing",
+            "Services",
+            "Agri-Processing"
+        ],
+        "eligibility": "Age > 18, Min 8th Pass for projects > 10L",
+        "source_url": "https://www.kviconline.gov.in/pmegpeportal/"
+    },
+    {
+        "id": "scheme_pmfme",
+        "name": "PM Formalisation of Micro food processing Enterprises (PMFME)",
+        "description": "Financial, technical and business support for micro food processing enterprises.",
+        "subsidy_percentage": 35,
+        "max_project_cost": 3000000,
+        "target_sectors": [
+            "Food Processing",
+            "Agri-Processing"
+        ],
+        "eligibility": "Existing micro food processing units, FPOs, SHGs",
+        "source_url": "https://pmfme.mofpi.gov.in/"
+    },
+    {
+        "id": "scheme_mudra",
+        "name": "Pradhan Mantri MUDRA Yojana (PMMY)",
+        "description": "Loans up to 10 Lakhs to non-corporate, non-farm small/micro enterprises.",
+        "subsidy_percentage": 0,
+        "max_project_cost": 1000000,
+        "target_sectors": [
+            "All"
+        ],
+        "eligibility": "Non-corporate small business segment",
+        "source_url": "https://www.mudra.org.in/"
+    },
+    {
+        "id": "MOCK_SCHEME_1",
+        "name": "National Empowerment Scheme 1",
+        "agency": "Ministry of Agriculture",
+        "subsidy_percentage": 34,
+        "max_subsidy_amount": 983000,
+        "eligible_sectors": [
+            "Energy",
+            "Retail"
+        ],
+        "type": "Interest Subvention",
+        "description": "A mock scheme providing up to 18% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_2",
+        "name": "National Empowerment Scheme 2",
+        "agency": "State Govt",
+        "subsidy_percentage": 27,
+        "max_subsidy_amount": 259000,
+        "eligible_sectors": [
+            "Retail",
+            "Services",
+            "Energy"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 42% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_3",
+        "name": "National Empowerment Scheme 3",
+        "agency": "NABARD",
+        "subsidy_percentage": 38,
+        "max_subsidy_amount": 125000,
+        "eligible_sectors": [
+            "Manufacturing",
+            "Agriculture",
+            "Services"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 43% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_4",
+        "name": "National Empowerment Scheme 4",
+        "agency": "State Govt",
+        "subsidy_percentage": 34,
+        "max_subsidy_amount": 735000,
+        "eligible_sectors": [
+            "Manufacturing",
+            "Services",
+            "Textiles",
+            "Technology"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 45% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_5",
+        "name": "National Empowerment Scheme 5",
+        "agency": "State Govt",
+        "subsidy_percentage": 47,
+        "max_subsidy_amount": 802000,
+        "eligible_sectors": [
+            "Services",
+            "Technology"
+        ],
+        "type": "Interest Subvention",
+        "description": "A mock scheme providing up to 42% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_6",
+        "name": "National Empowerment Scheme 6",
+        "agency": "Ministry of MSME",
+        "subsidy_percentage": 16,
+        "max_subsidy_amount": 318000,
+        "eligible_sectors": [
+            "Logistics",
+            "Manufacturing",
+            "Technology"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 18% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_7",
+        "name": "National Empowerment Scheme 7",
+        "agency": "Ministry of Agriculture",
+        "subsidy_percentage": 28,
+        "max_subsidy_amount": 764000,
+        "eligible_sectors": [
+            "Agriculture",
+            "Textiles"
+        ],
+        "type": "Interest Subvention",
+        "description": "A mock scheme providing up to 21% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_8",
+        "name": "National Empowerment Scheme 8",
+        "agency": "Ministry of MSME",
+        "subsidy_percentage": 38,
+        "max_subsidy_amount": 900000,
+        "eligible_sectors": [
+            "Manufacturing"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 34% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_9",
+        "name": "National Empowerment Scheme 9",
+        "agency": "Ministry of MSME",
+        "subsidy_percentage": 19,
+        "max_subsidy_amount": 388000,
+        "eligible_sectors": [
+            "Manufacturing",
+            "Logistics",
+            "Agriculture",
+            "Technology"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 33% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_10",
+        "name": "National Empowerment Scheme 10",
+        "agency": "NABARD",
+        "subsidy_percentage": 28,
+        "max_subsidy_amount": 855000,
+        "eligible_sectors": [
+            "Services",
+            "Energy",
+            "Agriculture",
+            "Retail"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 33% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_11",
+        "name": "National Empowerment Scheme 11",
+        "agency": "NABARD",
+        "subsidy_percentage": 43,
+        "max_subsidy_amount": 480000,
+        "eligible_sectors": [
+            "Textiles",
+            "Services",
+            "Technology"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 27% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_12",
+        "name": "National Empowerment Scheme 12",
+        "agency": "Ministry of MSME",
+        "subsidy_percentage": 40,
+        "max_subsidy_amount": 327000,
+        "eligible_sectors": [
+            "Textiles",
+            "Agriculture",
+            "Energy",
+            "Food Processing"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 24% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_13",
+        "name": "National Empowerment Scheme 13",
+        "agency": "NABARD",
+        "subsidy_percentage": 44,
+        "max_subsidy_amount": 177000,
+        "eligible_sectors": [
+            "Services",
+            "Energy"
+        ],
+        "type": "Interest Subvention",
+        "description": "A mock scheme providing up to 47% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_14",
+        "name": "National Empowerment Scheme 14",
+        "agency": "State Govt",
+        "subsidy_percentage": 46,
+        "max_subsidy_amount": 294000,
+        "eligible_sectors": [
+            "Agriculture",
+            "Logistics"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 38% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_15",
+        "name": "National Empowerment Scheme 15",
+        "agency": "State Govt",
+        "subsidy_percentage": 30,
+        "max_subsidy_amount": 476000,
+        "eligible_sectors": [
+            "Food Processing",
+            "Services",
+            "Technology"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 39% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_16",
+        "name": "National Empowerment Scheme 16",
+        "agency": "Ministry of Agriculture",
+        "subsidy_percentage": 29,
+        "max_subsidy_amount": 579000,
+        "eligible_sectors": [
+            "Technology",
+            "Services",
+            "Textiles",
+            "Retail"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 36% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_17",
+        "name": "National Empowerment Scheme 17",
+        "agency": "Ministry of MSME",
+        "subsidy_percentage": 25,
+        "max_subsidy_amount": 343000,
+        "eligible_sectors": [
+            "Technology",
+            "Services",
+            "Logistics",
+            "Food Processing"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 28% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_18",
+        "name": "National Empowerment Scheme 18",
+        "agency": "Ministry of MSME",
+        "subsidy_percentage": 45,
+        "max_subsidy_amount": 756000,
+        "eligible_sectors": [
+            "Logistics",
+            "Technology"
+        ],
+        "type": "Interest Subvention",
+        "description": "A mock scheme providing up to 38% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_19",
+        "name": "National Empowerment Scheme 19",
+        "agency": "State Govt",
+        "subsidy_percentage": 44,
+        "max_subsidy_amount": 203000,
+        "eligible_sectors": [
+            "Technology",
+            "Retail"
+        ],
+        "type": "Margin Money Subsidy",
+        "description": "A mock scheme providing up to 40% subsidy for rural entrepreneurs."
+    },
+    {
+        "id": "MOCK_SCHEME_20",
+        "name": "National Empowerment Scheme 20",
+        "agency": "NABARD",
+        "subsidy_percentage": 41,
+        "max_subsidy_amount": 397000,
+        "eligible_sectors": [
+            "Retail",
+            "Food Processing",
+            "Services",
+            "Manufacturing"
+        ],
+        "type": "Direct Benefit Transfer",
+        "description": "A mock scheme providing up to 34% subsidy for rural entrepreneurs."
+    }
 ]

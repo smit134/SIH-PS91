@@ -1,7 +1,9 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException, Body, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 from typing import List, Optional, Any
 from app.services.llm_service import generate_chat_response
+from app.core.database import get_db
 
 router = APIRouter()
 
@@ -17,7 +19,7 @@ class ChatResponse(BaseModel):
     response: str
 
 @router.post("/", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest = Body(...)):
+async def chat_endpoint(request: ChatRequest = Body(...), db: AsyncSession = Depends(get_db)):
     """
     Endpoint for the AI Chatbot Assistant.
     """
@@ -30,12 +32,15 @@ async def chat_endpoint(request: ChatRequest = Body(...)):
             import json
             from app.models.user import EntrepreneurProfile, LocationPoint
             from app.engines.opportunity_engine import OpportunityEngine
-            from app.engines.partner_engine import PartnerMatchEngine
+            from app.engines.partner_engine import PartnerEngine
             from app.models.common import RiskLevel
             
             raw_data = request.context_data or {}
             profile_str = raw_data.get("user_profile_data", "{}")
-            raw_profile = json.loads(profile_str) if profile_str else {}
+            try:
+                raw_profile = json.loads(profile_str) if profile_str else {}
+            except Exception:
+                raw_profile = {}
             
             equity_str = str(raw_profile.get("ownEquity", "150000"))
             equity = int(''.join(filter(str.isdigit, equity_str)) or 150000)
@@ -63,15 +68,15 @@ async def chat_endpoint(request: ChatRequest = Body(...)):
             )
             
             # Fetch backend data
-            search_res = OpportunityEngine.reverse_business_search(profile)
+            search_res = await OpportunityEngine.reverse_business_search(db, profile)
             top_opps = [
-                f"{opp.business_id} (Fit: {opp.overall_fit_score_percent}%): Cap: {opp.financial_feasibility.estimated_capital_required}, ROI: {opp.financial_feasibility.projected_roi_percent}%"
+                f"{opp.business_id} (Fit: {opp.overall_fit_score} - {opp.overall_fit_score}%): Cap: {opp.capital_required_rec}"
                 for opp in search_res.ranked_opportunities[:3]
             ]
             
-            partners = PartnerMatchEngine.find_matches(profile, max_radius_km=50.0)
+            partners = PartnerEngine.find_complementary_partners(profile, max_radius_km=50.0)
             top_partners = [
-                f"{p.name} ({p.type}) Synergy: {p.synergy_score}%"
+                f"{p.display_title} Synergy: {p.synergy_score}%"
                 for p in partners[:3]
             ]
             
