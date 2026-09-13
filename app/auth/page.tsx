@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Phone, ArrowRight, Sparkles } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AuthPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +17,11 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Clear previous user information before logging in/signing up
+    localStorage.removeItem("thinkforge_token");
+    localStorage.removeItem("thinkforge_name");
+    localStorage.removeItem("thinkforge_profile");
     
     try {
       const res = await fetch("http://localhost:8000/users/auth", {
@@ -56,19 +63,19 @@ export default function AuthPage() {
             <Sparkles className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            {isLogin ? "Welcome back to ThinkForge" : "Create your account"}
+            {isLogin ? t("auth_welcome_login") : t("auth_welcome_register")}
           </h1>
           <p className="text-sm text-slate-400 mt-2">
             {isLogin 
-              ? "Sign in to access your dashboard and opportunities." 
-              : "Sign up to start your entrepreneurial journey."}
+              ? t("auth_subtitle_login") 
+              : t("auth_subtitle_register")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">Full Name</label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">{t("auth_full_name")}</label>
               <div className="relative">
                 <div className="absolute left-3.5 top-3 w-4 h-4 text-slate-500 flex items-center justify-center font-bold">@</div>
                 <input 
@@ -76,7 +83,7 @@ export default function AuthPage() {
                   required={!isLogin}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ramesh Kumar"
+                  placeholder={t("auth_name_placeholder")}
                   className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all"
                 />
               </div>
@@ -84,7 +91,7 @@ export default function AuthPage() {
           )}
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Phone Number</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">{t("auth_phone_number")}</label>
             <div className="relative">
               <Phone className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input 
@@ -99,7 +106,7 @@ export default function AuthPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">{t("auth_password")}</label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input 
@@ -118,19 +125,19 @@ export default function AuthPage() {
             disabled={loading}
             className="w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-brand-600 to-teal-600 text-white hover:opacity-95 shadow-glow-teal transition-all disabled:opacity-50"
           >
-            {loading ? "Authenticating..." : (isLogin ? "Sign In" : "Sign Up")}
+            {loading ? t("auth_authenticating") : (isLogin ? t("auth_sign_in") : t("auth_sign_up"))}
             {!loading && <ArrowRight className="w-4 h-4" />}
           </button>
         </form>
 
         <div className="mt-6 text-center text-xs text-slate-400">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
+          {isLogin ? t("auth_no_account") : t("auth_have_account")}
           <button 
             type="button"
             onClick={() => setIsLogin(!isLogin)}
             className="ml-1.5 text-brand-400 hover:text-brand-300 font-semibold transition-colors"
           >
-            {isLogin ? "Sign up" : "Sign in"}
+            {isLogin ? t("auth_sign_up") : t("auth_sign_in")}
           </button>
         </div>
       </div>

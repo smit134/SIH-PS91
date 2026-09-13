@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   MapPin,
@@ -16,6 +16,7 @@ import {
   Lightbulb,
 } from "lucide-react";
 import clsx from "clsx";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FormData {
   // Step 1: Location & Profile
@@ -92,19 +93,34 @@ const initialFormData: FormData = {
 };
 
 const steps = [
-  { id: 1, title: "Location", icon: MapPin, desc: "Geographic cluster & market access" },
-  { id: 2, title: "Skills", icon: Wrench, desc: "Vocational expertise & history" },
-  { id: 3, title: "Capital", icon: IndianRupee, desc: "Equity & borrowing willingness" },
-  { id: 4, title: "Interests", icon: Briefcase, desc: "Preferred business sector" },
-  { id: 5, title: "Resources", icon: Building2, desc: "Physical space, power & assets" },
-  { id: 6, title: "Risk & Horizon", icon: ShieldAlert, desc: "Risk tolerance & timeline" },
+  { id: 1, title: "Location", icon: MapPin, descKey: "reg_loc_desc_s", titleKey: "reg_loc_title" },
+  { id: 2, title: "Skills", icon: Wrench, descKey: "reg_skills_desc_s", titleKey: "reg_skills_title" },
+  { id: 3, title: "Capital", icon: IndianRupee, descKey: "reg_cap_desc_s", titleKey: "reg_cap_title" },
+  { id: 4, title: "Interests", icon: Briefcase, descKey: "reg_int_desc_s", titleKey: "reg_int_title" },
+  { id: 5, title: "Resources", icon: Building2, descKey: "reg_res_desc_s", titleKey: "reg_res_title" },
+  { id: 6, title: "Risk & Horizon", icon: ShieldAlert, descKey: "reg_risk_desc_s", titleKey: "reg_risk_title" },
 ];
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedProfile = localStorage.getItem("thinkforge_profile");
+      if (storedProfile) {
+        try {
+          const parsed = JSON.parse(storedProfile);
+          setFormData((prev) => ({ ...prev, ...parsed }));
+        } catch (err) {
+          console.error("Failed to parse stored profile", err);
+        }
+      }
+    }
+  }, []);
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -164,13 +180,13 @@ export default function RegisterPage() {
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-950 border border-brand-800/80 text-brand-400 text-xs font-semibold mb-3">
           <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Smart Rural Onboarding Wizard</span>
+          <span>{t("reg_wizard_title")}</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Entrepreneur Capability Profile
+          {t("reg_profile_title")}
         </h1>
         <p className="mt-2 text-sm text-slate-400 max-w-xl mx-auto">
-          ThinkForge uses your grounded inputs to evaluate localized feasibility, match schemes, and synthesize a bankable roadmap.
+          {t("reg_profile_desc")}
         </p>
       </div>
 
@@ -178,10 +194,10 @@ export default function RegisterPage() {
       <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 sm:p-6 mb-8 shadow-xl">
         <div className="flex items-center justify-between text-xs font-semibold mb-3">
           <span className="text-slate-400">
-            Step <span className="text-brand-400 font-bold">{currentStep}</span> of 6:{" "}
-            <span className="text-white">{steps[currentStep - 1].title}</span>
+            {t("reg_step")} <span className="text-brand-400 font-bold">{currentStep}</span> {t("reg_of")} 6:{" "}
+            <span className="text-white">{t(steps[currentStep - 1].titleKey)}</span>
           </span>
-          <span className="text-emerald-400 font-mono">{progressPercent}% Completed</span>
+          <span className="text-emerald-400 font-mono">{progressPercent}% {t("reg_completed")}</span>
         </div>
 
         {/* Progress Bar Track */}
@@ -226,7 +242,7 @@ export default function RegisterPage() {
                   {isDone ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                 </div>
                 <span className="text-[10px] font-semibold truncate hidden sm:block">
-                  {s.title}
+                  {t(s.titleKey)}
                 </span>
               </button>
             );
@@ -244,19 +260,19 @@ export default function RegisterPage() {
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Geographic & Rural Cluster</h3>
+                <h3 className="text-lg font-bold text-white">{t("reg_geo_title")}</h3>
                 <p className="text-xs text-slate-400">
-                  Where will your business operate? Helps calculate local demand & APMC mandi distance.
+                  {t("reg_geo_desc")}
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">Full Name</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">{t("reg_full_name")}</label>
                 <input
                   type="text"
-                  placeholder="Enter your name"
+                  placeholder={t("reg_enter_name")}
                   value={formData.name}
                   onChange={(e) => updateField("name", e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
@@ -264,7 +280,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">State</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">{t("reg_state")}</label>
                 <select
                   value={formData.state}
                   onChange={(e) => {
@@ -274,7 +290,7 @@ export default function RegisterPage() {
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none"
                 >
-                  <option value="">Select State...</option>
+                  <option value="">{t("reg_select_state")}</option>
                   {Object.keys(locationData).map(state => (
                     <option key={state} value={state}>{state}</option>
                   ))}
@@ -282,7 +298,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1.5">District</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1.5">{t("reg_district")}</label>
                 <select
                   value={formData.district}
                   onChange={(e) => {
@@ -292,7 +308,7 @@ export default function RegisterPage() {
                   disabled={!formData.state}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none disabled:opacity-50"
                 >
-                  <option value="">Select District...</option>
+                  <option value="">{t("reg_select_district")}</option>
                   {formData.state && locationData[formData.state] && Object.keys(locationData[formData.state]).map(district => (
                     <option key={district} value={district}>{district}</option>
                   ))}
@@ -301,7 +317,7 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                  Block / Gram Panchayat
+                  {t("reg_block")}
                 </label>
                 <select
                   value={formData.block}
@@ -309,7 +325,7 @@ export default function RegisterPage() {
                   disabled={!formData.district}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-white text-sm focus:border-brand-500 focus:outline-none disabled:opacity-50"
                 >
-                  <option value="">Select Block...</option>
+                  <option value="">{t("reg_select_block")}</option>
                   {formData.state && formData.district && locationData[formData.state]?.[formData.district]?.map(block => (
                     <option key={block} value={block}>{block}</option>
                   ))}
@@ -711,7 +727,7 @@ export default function RegisterPage() {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              Previous Step
+              {t("reg_prev_step")}
             </button>
           ) : (
             <div />
@@ -723,7 +739,7 @@ export default function RegisterPage() {
               onClick={handleNext}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-brand-600 text-white hover:bg-brand-500 shadow-glow-teal transition-all"
             >
-              <span>Continue to {steps[currentStep].title}</span>
+              <span>{t("reg_continue_to")} {steps[currentStep].title}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
@@ -734,7 +750,7 @@ export default function RegisterPage() {
               className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500 via-emerald-600 to-teal-600 text-white hover:opacity-95 shadow-glow-emerald transition-all transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <Sparkles className="w-4 h-4 text-emerald-100" />
-              <span>{isSubmitting ? "Synthesizing Roadmap..." : "Complete & Launch Dashboard"}</span>
+              <span>{isSubmitting ? t("reg_synthesizing") : t("reg_complete_btn")}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}

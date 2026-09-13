@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import EvidenceBadge from "@/components/EvidenceBadge";
 import { FileSpreadsheet, Download, FileText, CheckCircle2, Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ReportsPage() {
   const [downloading, setDownloading] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   const reports = [
     {
@@ -188,13 +190,13 @@ export default function ReportsPage() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-brand-700">
             <FileSpreadsheet className="w-4 h-4 text-brand-600" />
-            <span>EXECUTIVE REPORTS & DPRS</span>
+            <span>{t("EXECUTIVE REPORTS & DPRS")}</span>
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500">Bankable Project Reports</span>
+            <span className="text-slate-500">{t("Bankable Project Reports")}</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mt-1">Exportable Dossiers</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mt-1">{t("Exportable Dossiers")}</h1>
           <p className="text-sm text-slate-600">
-            Download standard bank-ready Detailed Project Reports (DPR), subsidy annexures, and capability scorecards.
+            {t("Download standard bank-ready Detailed Project Reports (DPR), subsidy annexures, and capability scorecards.")}
           </p>
         </div>
 
@@ -204,7 +206,7 @@ export default function ReportsPage() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 shadow-glow-teal transition-all disabled:opacity-50"
         >
           {downloading === "ThinkForge_New_Dossier" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4 text-emerald-200" />}
-          Generate New Bank Dossier
+          {t("Generate New Bank Dossier")}
         </button>
       </div>
 
@@ -220,10 +222,10 @@ export default function ReportsPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-slate-500">{report.type}</span>
+                  <span className="text-xs font-bold text-slate-500">{t(report.type)}</span>
                   <EvidenceBadge type={report.evidence} />
                 </div>
-                <h3 className="font-bold text-base text-slate-900">{report.title}</h3>
+                <h3 className="font-bold text-base text-slate-900">{t(report.title)}</h3>
                 <p className="text-xs text-slate-500 mt-0.5">{report.date} • {report.pages}</p>
               </div>
             </div>
@@ -234,7 +236,7 @@ export default function ReportsPage() {
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-brand-700 transition-colors shrink-0 disabled:opacity-70"
             >
               {downloading === report.title ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-              <span>{downloading === report.title ? "Generating..." : "Download"}</span>
+              <span>{downloading === report.title ? t("Generating...") : t("Download")}</span>
             </button>
           </div>
         ))}
