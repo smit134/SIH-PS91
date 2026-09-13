@@ -86,8 +86,13 @@ async def chat_endpoint(request: ChatRequest = Body(...), db: AsyncSession = Dep
                 schemes_data = json.load(f)
                 schemes_info = [f"{s['title']}: {s.get('max_subsidy_percentage', 'N/A')}% Subsidy" for s in schemes_data[:3]]
                 
+            page_text = raw_data.get("page_text_content", "")
+            page_title = raw_data.get("title", "")
+            
             rag_context = (
                 f"User Profile Info: {profile_str}\n"
+                f"Current Page User is Viewing: {page_title}\n"
+                f"Current Page Content: {page_text[:5000]}\n"
                 f"Top 3 Opportunities from Backend Database: {top_opps}\n"
                 f"Top 3 Partner Matches from Backend Database: {top_partners}\n"
                 f"Top Government Schemes Available: {schemes_info}\n"

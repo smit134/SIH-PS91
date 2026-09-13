@@ -27,6 +27,7 @@ import {
   Edit3
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Standard Opportunities catalog matching business_catalog.py
 const OPPORTUNITY_CONFIGS = [
@@ -315,6 +316,7 @@ const FALLBACK_SCHEMES = [
 function SchemesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { t } = useLanguage();
 
   // User Profile State from LocalStorage / Registration
   const [userProfile, setUserProfile] = useState<any | null>(null);
@@ -585,15 +587,15 @@ function SchemesContent() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-brand-700">
             <Landmark className="w-4 h-4 text-brand-600" />
-            <span>POLICY & SUBSIDY ROUTING</span>
+            <span>{t("POLICY & SUBSIDY ROUTING")}</span>
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500">Government Scheme Matching</span>
+            <span className="text-slate-500">{t("Government Scheme Matching")}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mt-1">
-            Personalized Government Scheme Suggestions
+            {t("Personalized Government Scheme Suggestions")}
           </h1>
           <p className="text-sm text-slate-600">
-            Official Central & State subsidies dynamically matched against your skills, available equity, and chosen business opportunity.
+            {t("Official Central & State subsidies dynamically matched against your skills, available equity, and chosen business opportunity.")}
           </p>
         </div>
 
@@ -606,7 +608,7 @@ function SchemesContent() {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 shadow-glow-teal transition-all"
           >
             <Sparkles className="w-4 h-4 text-emerald-200" />
-            Auto-Fill Scheme Application
+            {t("Auto-Fill Scheme Application")}
           </button>
         </div>
       </div>
@@ -621,14 +623,14 @@ function SchemesContent() {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-white leading-tight">
-                  Suggested Schemes for {userName}
+                  {t("Suggested Schemes for")} {t(userName)}
                 </h3>
                 <span className="bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-semibold px-2 py-0.5 rounded-full">
-                  Profile Calibrated
+                  {t("Profile Calibrated")}
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-0.5">
-                Evaluated against your verified equity, vocational skills, rural residence, and collateral capability.
+                {t("Evaluated against your verified equity, vocational skills, rural residence, and collateral capability.")}
               </p>
             </div>
           </div>
@@ -638,44 +640,44 @@ function SchemesContent() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/15 transition-colors self-start md:self-auto"
           >
             <Edit3 className="w-3.5 h-3.5 text-emerald-300" />
-            <span>Update Capability Inputs</span>
+            <span>{t("Update Capability Inputs")}</span>
           </Link>
         </div>
 
         {/* Profile Attributes Badges */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-3 text-xs">
           <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
-            <span className="text-slate-400 text-[10px] block font-medium">📍 Rural Cluster</span>
+            <span className="text-slate-400 text-[10px] block font-medium">📍 {t("Rural Cluster")}</span>
             <span className="font-bold text-slate-100 truncate block mt-0.5">
-              {userProfile?.district || "Wardha"}, {userProfile?.state || "Maharashtra"}
+              {t(userProfile?.district || "Wardha")}, {t(userProfile?.state || "Maharashtra")}
             </span>
           </div>
 
           <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
-            <span className="text-slate-400 text-[10px] block font-medium">💼 Primary Skill</span>
+            <span className="text-slate-400 text-[10px] block font-medium">💼 {t("Primary Skill")}</span>
             <span className="font-bold text-slate-100 truncate block mt-0.5">
-              {userProfile?.primarySkill || "Agri-Processing"}
+              {t(userProfile?.primarySkill || "Agri-Processing")}
             </span>
           </div>
 
           <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
-            <span className="text-slate-400 text-[10px] block font-medium">💰 Available Equity</span>
+            <span className="text-slate-400 text-[10px] block font-medium">💰 {t("Available Equity")}</span>
             <span className="font-bold text-emerald-300 truncate block mt-0.5">
               ₹{userEquityAmount.toLocaleString()}
             </span>
           </div>
 
           <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
-            <span className="text-slate-400 text-[10px] block font-medium">👥 SHG Membership</span>
+            <span className="text-slate-400 text-[10px] block font-medium">👥 {t("SHG Membership")}</span>
             <span className="font-bold text-slate-100 truncate block mt-0.5">
-              {userProfile?.isShgMember ? "Yes (Seed Grant Active)" : "Individual Applicant"}
+              {userProfile?.isShgMember ? t("Yes (Seed Grant Active)") : t("Individual Applicant")}
             </span>
           </div>
 
           <div className="bg-white/5 rounded-xl p-2.5 border border-white/10">
-            <span className="text-slate-400 text-[10px] block font-medium">🛡️ Collateral Preference</span>
+            <span className="text-slate-400 text-[10px] block font-medium">🛡️ {t("Collateral Preference")}</span>
             <span className="font-bold text-slate-100 truncate block mt-0.5">
-              {userProfile?.hasCollateral ? "Asset Backed" : "Zero Collateral (CGTMSE)"}
+              {userProfile?.hasCollateral ? t("Asset Backed") : t("Zero Collateral (CGTMSE)")}
             </span>
           </div>
         </div>
@@ -686,12 +688,12 @@ function SchemesContent() {
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase tracking-wider">
             <Layers className="w-4 h-4 text-brand-600" />
-            <span>Target Business Opportunity</span>
+            <span>{t("Target Business Opportunity")}</span>
           </div>
           <span className="text-xs text-slate-500 font-medium">
             {selectedOpportunityId === "all"
-              ? "All Opportunities"
-              : `Calibrated for ${currentOpp.name}`}
+              ? t("All Opportunities")
+              : `${t("Calibrated for")} ${t(currentOpp.name)}`}
           </span>
         </div>
 
@@ -710,11 +712,11 @@ function SchemesContent() {
               >
                 <span className="text-xl mb-1">{opp.emoji}</span>
                 <span className="text-[11px] font-semibold leading-tight line-clamp-2">
-                  {opp.name}
+                  {t(opp.name)}
                 </span>
                 {opp.id !== "all" && (
                   <span className="text-[10px] text-slate-500 mt-1 font-mono">
-                    ₹{(opp.capex / 1000).toFixed(0)}k capex
+                    ₹{(opp.capex / 1000).toFixed(0)}k {t("capex")}
                   </span>
                 )}
               </button>
@@ -731,23 +733,23 @@ function SchemesContent() {
               <div className="flex items-center gap-2">
                 <span className="text-lg">{currentOpp.emoji}</span>
                 <span className="text-xs font-semibold uppercase tracking-wider text-emerald-300">
-                  Target Opportunity: {currentOpp.sector}
+                  {t("Target Opportunity:")} {t(currentOpp.sector)}
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-white">{currentOpp.name}</h2>
+              <h2 className="text-xl font-bold text-white">{t(currentOpp.name)}</h2>
               <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-                {currentOpp.description} Standard project investment is ₹{currentOpp.capex.toLocaleString()}. Your ₹{userEquityAmount.toLocaleString()} equity covers the promoter share.
+                {t(currentOpp.description)} {t("Standard project investment is")} ₹{currentOpp.capex.toLocaleString()}. {t("Your")} ₹{userEquityAmount.toLocaleString()} {t("equity covers the promoter share.")}
               </p>
             </div>
 
             <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
               <div className="bg-white/10 backdrop-blur-sm border border-white/15 px-4 py-3 rounded-xl text-center min-w-[130px]">
-                <span className="text-[11px] text-emerald-200 block font-medium">Capex Needed</span>
+                <span className="text-[11px] text-emerald-200 block font-medium">{t("Capex Needed")}</span>
                 <span className="text-base font-bold text-white">₹{currentOpp.capex.toLocaleString()}</span>
               </div>
 
               <div className="bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/30 px-4 py-3 rounded-xl text-center min-w-[150px]">
-                <span className="text-[11px] text-emerald-300 block font-medium">Max Gov Subsidy</span>
+                <span className="text-[11px] text-emerald-300 block font-medium">{t("Max Gov Subsidy")}</span>
                 <span className="text-base font-bold text-emerald-300">
                   ₹{maxPossibleSubsidy.toLocaleString()}
                 </span>
@@ -756,9 +758,9 @@ function SchemesContent() {
               <button
                 onClick={() => handleSelectOpportunity("all")}
                 className="px-3 py-3 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white transition-colors border border-white/10"
-                title="Clear filter to view all government schemes"
+                title={t("Clear Filter")}
               >
-                Clear Filter
+                {t("Clear Filter")}
               </button>
             </div>
           </div>
@@ -770,7 +772,7 @@ function SchemesContent() {
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
           <span className="text-slate-400 font-medium flex items-center gap-1 pl-1">
             <Filter className="w-3.5 h-3.5" />
-            Filter:
+            {t("Filter:")}
           </span>
 
           <button
@@ -782,7 +784,7 @@ function SchemesContent() {
             }`}
           >
             <Sparkles className="w-3 h-3 text-emerald-300" />
-            <span>Top Matches for You</span>
+            <span>{t("Top Matches for You")}</span>
           </button>
 
           <button
@@ -793,7 +795,7 @@ function SchemesContent() {
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            All Schemes ({processedSchemes.length})
+            {t("All Schemes")} ({processedSchemes.length})
           </button>
 
           {selectedOpportunityId !== "all" && (
@@ -805,7 +807,7 @@ function SchemesContent() {
                   : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
             >
-              Direct Sector Schemes
+              {t("Direct Sector Schemes")}
             </button>
           )}
 
@@ -817,7 +819,7 @@ function SchemesContent() {
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            High Subsidy (&gt;30%)
+            {t("High Subsidy (>30%)")}
           </button>
 
           <button
@@ -828,7 +830,7 @@ function SchemesContent() {
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            100% Collateral-Free
+            {t("100% Collateral-Free")}
           </button>
 
           <button
@@ -839,12 +841,12 @@ function SchemesContent() {
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
-            Women / SC / ST Priority
+            {t("Women / SC / ST Priority")}
           </button>
         </div>
 
         <div className="text-xs text-slate-500 font-medium">
-          Showing <span className="font-bold text-slate-800">{filteredSchemes.length}</span> schemes
+          {t("Showing")} <span className="font-bold text-slate-800">{filteredSchemes.length}</span> {t("schemes")}
         </div>
       </div>
 
@@ -872,36 +874,36 @@ function SchemesContent() {
                   <div className="space-y-1.5">
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                        {scheme.nodal_agency || "Central / State Ministry"}
+                        {t(scheme.nodal_agency) || t("Central / State Ministry")}
                       </span>
                       <EvidenceBadge type="VERIFIED" />
                       {isHighMatch && (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
                           <Sparkles className="w-3 h-3 text-emerald-600" />
-                          Top Personal Match for {userName.split(" ")[0]}
+                          {t("Top Personal Match for")} {t(userName.split(" ")[0])}
                         </span>
                       )}
                       {hasDirectBadge && (
                         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-full border border-brand-200">
-                          Recommended for {currentOpp.name}
+                          {t("Recommended for")} {t(currentOpp.name)}
                         </span>
                       )}
                       {scheme.status_tag && (
                         <span className="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-                          {scheme.status_tag}
+                          {t(scheme.status_tag)}
                         </span>
                       )}
                     </div>
 
                     <h3 className="text-lg font-bold text-slate-900 leading-snug">
-                      {scheme.scheme_name}
+                      {t(scheme.scheme_name)}
                     </h3>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
                     <div className="text-right">
                       <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 inline-block">
-                        {scheme.dynamicMatchScore || 92}% Match Score
+                        {scheme.dynamicMatchScore || 92}% {t("Match Score")}
                       </span>
                     </div>
                     <a
@@ -910,7 +912,7 @@ function SchemesContent() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white hover:bg-brand-700 transition-colors shadow-sm"
                     >
-                      <span>Official Portal</span>
+                      <span>{t("Official Portal")}</span>
                       <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                     </a>
                   </div>
@@ -918,21 +920,21 @@ function SchemesContent() {
 
                 {/* Description */}
                 <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-                  {scheme.description}
+                  {t(scheme.description)}
                 </p>
 
                 {/* Financial Calibration Box */}
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
                   <div className="p-3 bg-brand-50/60 rounded-xl border border-brand-100">
-                    <span className="text-slate-500 block font-medium">Subsidy Assistance</span>
+                    <span className="text-slate-500 block font-medium">{t("Subsidy Assistance")}</span>
                     <span className="font-bold text-brand-700 text-sm mt-0.5 block">
-                      {scheme.subsidy_rate_text || `${scheme.subsidy_percent}% Subsidy`}
+                      {t(scheme.subsidy_rate_text) || `${scheme.subsidy_percent}% Subsidy`}
                     </span>
                   </div>
 
                   <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100">
                     <span className="text-slate-500 block font-medium">
-                      Est. Subsidy on ₹{(currentOpp.capex / 1000).toFixed(0)}k Capex
+                      {t("Est. Subsidy on")} ₹{(currentOpp.capex / 1000).toFixed(0)}k {t("capex")}
                     </span>
                     <span className="font-bold text-emerald-700 text-sm mt-0.5 block">
                       {scheme.calculatedSubsidy > 0
@@ -942,22 +944,22 @@ function SchemesContent() {
                   </div>
 
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <span className="text-slate-500 block font-medium">Max Project Cap</span>
+                    <span className="text-slate-500 block font-medium">{t("Max Project Cap")}</span>
                     <span className="font-bold text-slate-900 text-sm mt-0.5 block">
                       ₹{((scheme.max_project_cost || scheme.project_cap || 1000000) / 100000).toFixed(0)} Lakhs
                     </span>
                   </div>
 
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                    <span className="text-slate-500 block font-medium">Collateral Requirement</span>
+                    <span className="text-slate-500 block font-medium">{t("Collateral Requirement")}</span>
                     <span className="font-bold text-slate-800 text-sm mt-0.5 flex items-center gap-1">
                       {scheme.collateral_free ? (
                         <>
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-700 font-semibold">100% Collateral Free</span>
+                          <span className="text-emerald-700 font-semibold">{t("100% Collateral Free")}</span>
                         </>
                       ) : (
-                        <span>Bank Term Loan / Hypothecation</span>
+                        <span>{t("Bank Term Loan / Hypothecation")}</span>
                       )}
                     </span>
                   </div>
@@ -968,13 +970,13 @@ function SchemesContent() {
                   <div className="mt-3.5 bg-slate-50/90 rounded-xl p-3.5 border border-slate-100">
                     <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-brand-600" />
-                      Why Recommended for {userName.split(" ")[0]} ({selectedOpportunityId === "all" ? "Rural Enterprise" : currentOpp.name}):
+                      {t("Why Recommended for")} {t(userName.split(" ")[0])} ({selectedOpportunityId === "all" ? t("Rural Enterprise") : t(currentOpp.name)}):
                     </span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {scheme.displayReasons.slice(0, 4).map((r: string, idx: number) => (
                         <div key={idx} className="flex items-start gap-1.5 text-xs text-slate-700">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{r}</span>
+                          <span>{t(r)}</span>
                         </div>
                       ))}
                     </div>
@@ -988,7 +990,7 @@ function SchemesContent() {
                       <div>
                         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                           <FileText className="w-3.5 h-3.5 text-brand-600" />
-                          Required Documents Checklist
+                          {t("Required Documents Checklist")}
                         </h4>
                         <ul className="space-y-1.5 text-xs text-slate-600">
                           {(scheme.documents_required || [
@@ -999,7 +1001,7 @@ function SchemesContent() {
                           ]).map((doc: string, dIdx: number) => (
                             <li key={dIdx} className="flex items-center gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
-                              <span>{doc}</span>
+                              <span>{t(doc)}</span>
                             </li>
                           ))}
                         </ul>
@@ -1008,13 +1010,13 @@ function SchemesContent() {
                       <div>
                         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                           <Building2 className="w-3.5 h-3.5 text-slate-600" />
-                          Application Routing & Convergence
+                          {t("Application Routing & Convergence")}
                         </h4>
                         <p className="text-xs text-slate-600 leading-relaxed">
-                          Applications can be submitted via the official portal or your local District Industries Centre (DIC) / Lead Bank Manager.
+                          {t("Applications can be submitted via the official portal or your local District Industries Centre (DIC) / Lead Bank Manager.")}
                           {scheme.subsidy_percent > 0 && (
                             <span className="block mt-1.5 font-medium text-brand-700">
-                              💡 Margin money is directly credited to your bank account after physical verification of machinery.
+                              💡 {t("Margin money is directly credited to your bank account after physical verification of machinery.")}
                             </span>
                           )}
                         </p>
@@ -1033,7 +1035,7 @@ function SchemesContent() {
                     }
                     className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors"
                   >
-                    <span>{isExpanded ? "Hide Requirements" : "View Required Documents & Routing"}</span>
+                    <span>{isExpanded ? t("Hide Requirements") : t("View Required Documents & Routing")}</span>
                     {isExpanded ? (
                       <ChevronUp className="w-3.5 h-3.5" />
                     ) : (
@@ -1047,7 +1049,7 @@ function SchemesContent() {
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-brand-700 hover:bg-brand-50 border border-brand-200 transition-colors"
                     >
                       <Coins className="w-3.5 h-3.5 text-brand-600" />
-                      <span>Simulate in Finance Engine</span>
+                      <span>{t("Simulate in Finance Engine")}</span>
                     </Link>
 
                     <button
@@ -1058,7 +1060,7 @@ function SchemesContent() {
                       className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-brand-600 text-white hover:bg-brand-700 shadow-sm transition-all"
                     >
                       <Sparkles className="w-3 h-3 text-emerald-200" />
-                      <span>Auto-Fill Application</span>
+                      <span>{t("Auto-Fill Application")}</span>
                     </button>
                   </div>
                 </div>
@@ -1075,10 +1077,10 @@ function SchemesContent() {
             <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/50">
               <div>
                 <span className="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5 block">
-                  AI Scheme Concierge
+                  {t("AI Scheme Concierge")}
                 </span>
                 <h3 className="text-lg font-bold text-slate-900 leading-tight">
-                  Auto-Fill Application Form
+                  {t("Auto-Fill Application Form")}
                 </h3>
               </div>
               <button
@@ -1095,59 +1097,59 @@ function SchemesContent() {
                   <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
                     <CheckCircle2 className="w-7 h-7" />
                   </div>
-                  <h4 className="text-base font-bold text-slate-900">Application Dossier Prepared!</h4>
+                  <h4 className="text-base font-bold text-slate-900">{t("Application Dossier Prepared!")}</h4>
                   <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
-                    Your pre-filled application dossier for <strong>{modalScheme.scheme_name}</strong> has been generated for <strong>{userName}</strong> ({userProfile?.district || "Wardha"} Cluster), featuring machinery quotes, bank margin subsidy, and technical capability verification.
+                    {t("Your pre-filled application dossier for")} <strong>{t(modalScheme.scheme_name)}</strong> {t("has been generated for")} <strong>{t(userName)}</strong> ({t(userProfile?.district || "Wardha")} {t("Rural Cluster")}), {t("featuring machinery quotes, bank margin subsidy, and technical capability verification.")}
                   </p>
                   <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-800 font-medium">
-                    Estimated Government Margin Money Subsidy: ₹{modalScheme.calculatedSubsidy?.toLocaleString()}
+                    {t("Estimated Government Margin Money Subsidy:")} ₹{modalScheme.calculatedSubsidy?.toLocaleString()}
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Applicant:</span>
-                      <span className="font-bold text-slate-800">{userName} ({userProfile?.district || "Wardha"}, {userProfile?.state || "Maharashtra"})</span>
+                      <span className="text-slate-500">{t("Applicant:")}</span>
+                      <span className="font-bold text-slate-800">{t(userName)} ({t(userProfile?.district || "Wardha")}, {t(userProfile?.state || "Maharashtra")})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Scheme:</span>
-                      <span className="font-bold text-slate-800">{modalScheme.short_code} ({modalScheme.nodal_agency})</span>
+                      <span className="text-slate-500">{t("Scheme:")}</span>
+                      <span className="font-bold text-slate-800">{t(modalScheme.short_code)} ({t(modalScheme.nodal_agency)})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Target Opportunity:</span>
-                      <span className="font-bold text-slate-800">{currentOpp.name}</span>
+                      <span className="text-slate-500">{t("Target Opportunity:")}</span>
+                      <span className="font-bold text-slate-800">{t(currentOpp.name)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Project Capex / Equity:</span>
-                      <span className="font-bold text-slate-800">₹{currentOpp.capex.toLocaleString()} (Promoter Equity: ₹{userEquityAmount.toLocaleString()})</span>
+                      <span className="text-slate-500">{t("Project Capex / Equity:")}</span>
+                      <span className="font-bold text-slate-800">₹{currentOpp.capex.toLocaleString()} ({t("Promoter Equity:")} ₹{userEquityAmount.toLocaleString()})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Subsidy Claim:</span>
+                      <span className="text-slate-500">{t("Subsidy Claim:")}</span>
                       <span className="font-bold text-emerald-700">₹{modalScheme.calculatedSubsidy?.toLocaleString()} ({modalScheme.subsidy_percent}%)</span>
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-700 block">
-                      Auto-Populated from Your Capability Dossier:
+                      {t("Auto-Populated from Your Capability Dossier:")}
                     </label>
                     <div className="space-y-1.5 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Entrepreneur KYC & {userProfile?.district || "Wardha"} Rural Certificate</span>
+                        <span>{t("Entrepreneur KYC &")} {t(userProfile?.district || "Wardha")} {t("Rural Certificate")}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Skill Accreditation: {userProfile?.primarySkill || "Agri-Processing"}</span>
+                        <span>{t("Skill Accreditation:")} {t(userProfile?.primarySkill || "Agri-Processing")}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Land ({userProfile?.landAccess || "Owned"}) & Power ({userProfile?.powerSupply || "Commercial"}) Declaration</span>
+                        <span>{t("Land")} ({t(userProfile?.landAccess || "Owned")}) {t("& Power")} ({t(userProfile?.powerSupply || "Commercial")}) {t("Declaration")}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Detailed Project Report (DPR) with 3-Year Financials</span>
+                        <span>{t("Detailed Project Report (DPR) with 3-Year Financials")}</span>
                       </div>
                     </div>
                   </div>
@@ -1160,7 +1162,7 @@ function SchemesContent() {
                 onClick={() => setModalScheme(null)}
                 className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
               >
-                Close
+                {t("Close")}
               </button>
               {!applicationSubmitted ? (
                 <button
@@ -1168,7 +1170,7 @@ function SchemesContent() {
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 shadow-glow-teal transition-all"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
-                  <span>Generate Pre-Filled Application Dossier</span>
+                  <span>{t("Generate Pre-Filled Application Dossier")}</span>
                 </button>
               ) : (
                 <a
@@ -1177,7 +1179,7 @@ function SchemesContent() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-brand-700 transition-colors"
                 >
-                  <span>Proceed to Official Submission</span>
+                  <span>{t("Proceed to Official Submission")}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
               )}
@@ -1190,11 +1192,12 @@ function SchemesContent() {
 }
 
 export default function SchemesPage() {
+  const { t } = useLanguage();
   return (
     <Suspense
       fallback={
         <div className="p-8 text-center text-slate-500 text-sm">
-          Loading personalized scheme recommendations...
+          {t("Loading personalized scheme recommendations...")}
         </div>
       }
     >
