@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     "AI-driven hyper-local rural entrepreneurship decision-support platform for micro-entrepreneurs. Feasibility, partners, financial structuring & government schemes.",
 };
 
+import AiAssistant from "./components/AiAssistant";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +26,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
-        <ShellWrapper>{children}</ShellWrapper>
+        <LanguageProvider>
+          <ShellWrapper>{children}</ShellWrapper>
+          <AiAssistant />
+        </LanguageProvider>
       </body>
     </html>
   );

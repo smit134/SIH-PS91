@@ -21,6 +21,7 @@ from app.routers.geospatial import router as geospatial_router
 from app.routers.finance import router as old_finance_router
 from app.routers.schemes import router as schemes_router
 from app.routers.users import router as users_router
+from app.routers.chat import router as chat_router
 
 # Configure structured logging
 logging.basicConfig(
@@ -80,6 +81,7 @@ def create_application() -> FastAPI:
     app.include_router(old_finance_router)
     app.include_router(schemes_router)
     app.include_router(users_router)
+    app.include_router(chat_router, prefix="/api/chat", tags=["AI Chatbot"])
 
     @app.get(
         "/health",

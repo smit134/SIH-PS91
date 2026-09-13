@@ -42,3 +42,17 @@ class SchemeMatchItem(BaseModel):
     reasons: List[str]
     application_route: str
     official_source: str
+    scheme_id: Optional[str] = None
+    short_code: Optional[str] = None
+    nodal_agency: Optional[str] = None
+    subsidy_percent: Optional[float] = 0.0
+    subsidy_rate_text: Optional[str] = None
+    max_project_cost: Optional[float] = None
+    estimated_subsidy_amount: Optional[float] = None
+    applicable_opportunities: Optional[List[str]] = None
+    priority_category: Optional[str] = None
+    collateral_free: Optional[bool] = False
+    description: Optional[str] = None
+    status_tag: Optional[str] = None
+    documents_required: Optional[List[str]] = None
+

@@ -31,50 +31,33 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [name, setName] = useState("Loading...");
-  const [username, setUsername] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const { t } = useLanguage();
+  const [name, setName] = useState(t("loading"));
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    const storedName = localStorage.getItem("thinkforge_name");
-    if (storedName) {
-      setName(storedName);
-    } else {
-      setName("Rural Entrepreneur");
-    }
+    const updateProfileData = () => {
+      const storedName = localStorage.getItem("thinkforge_name");
+      if (storedName) {
+        setName(storedName);
+      } else {
+        setName(t("prof_rural_entrepreneur"));
+      }
 
-    const storedPhone = localStorage.getItem("thinkforge_phone");
-    if (storedPhone) {
-      setPhone(storedPhone);
-    }
-
-    const storedEmail = localStorage.getItem("thinkforge_email");
-    if (storedEmail) {
-      setEmail(storedEmail);
-    }
-
-    const storedUsername = localStorage.getItem("thinkforge_username");
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-
-    const storedProfileStr = localStorage.getItem("thinkforge_profile");
-    if (storedProfileStr) {
-      try {
-        const parsed = JSON.parse(storedProfileStr);
-        setProfile(parsed);
-        if (parsed.phone && !storedPhone) setPhone(parsed.phone);
-        if (parsed.email && !storedEmail) setEmail(parsed.email);
-        if (parsed.username && !storedUsername) setUsername(parsed.username);
-      } catch (e) {
-        console.error("Failed to parse profile", e);
+      const storedProfileStr = localStorage.getItem("thinkforge_profile");
+      if (storedProfileStr) {
+        try {
+          setProfile(JSON.parse(storedProfileStr));
+        } catch (e) {
+          console.error("Failed to parse profile", e);
+        }
       }
     }
+    updateProfileData();
   }, []);
 
   const handleLogout = () => {
@@ -88,7 +71,7 @@ export default function ProfilePage() {
   };
 
   const getInitials = (n: string) => {
-    if (!n || n === "Loading...") return "EN";
+    if (!n || n === t("loading") || n === "Loading...") return "EN";
     const parts = n.split(" ");
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -103,13 +86,13 @@ export default function ProfilePage() {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-brand-700">
             <UserCircle2 className="w-4 h-4 text-brand-600" />
-            <span>ENTREPRENEUR PROFILE</span>
+            <span>{t("prof_title")}</span>
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500">Comprehensive Capability Dossier</span>
+            <span className="text-slate-500">{t("prof_capability_dossier")}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mt-1">{name}</h1>
           <p className="text-sm text-slate-600">
-            Registered Micro-Entrepreneur • {profile ? `${profile.district || "Wardha"} Cluster` : "Wardha Cluster"} • Feasibility Tier 1 Verified
+            {t("prof_reg_micro_ent")} • {profile ? `${profile.district || "Local"} ${t("prof_cluster")}` : t("loading")} • {t("prof_readiness_score")}: 78%
           </p>
         </div>
 
@@ -119,14 +102,14 @@ export default function ProfilePage() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700 shadow-glow-teal transition-all"
           >
             <Edit3 className="w-4 h-4 text-emerald-200" />
-            Update Profile
+            {t("prof_update_btn")}
           </Link>
           <button
             onClick={handleLogout}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-red-600 text-white hover:bg-red-700 shadow-glow-red transition-all"
           >
             <LogOut className="w-4 h-4 text-white" />
-            Logout
+            {t("prof_logout")}
           </button>
         </div>
       </div>
@@ -149,152 +132,61 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-
-            {/* Credentials */}
-            <div className="pt-4 border-t border-slate-100 space-y-3 text-xs">
-              <div>
-                <span className="text-slate-400 block font-medium">Username</span>
-                <span className="font-semibold text-slate-800">
-                  {username || (name && name !== "Loading..." ? `@${name.toLowerCase().replace(/[^a-z0-9]/g, "_")}` : "@rural_entrepreneur")}
-                </span>
-              </div>
-              <div>
-                <span className="text-slate-400 block font-medium">Phone Number</span>
-                <span className="font-semibold text-slate-800">
-                  {phone || "+91 98765 43210"}
-                </span>
-              </div>
-              <div>
-                <span className="text-slate-400 block font-medium">Email</span>
-                <span className="font-semibold text-slate-800">
-                  {email || (name && name !== "Loading..." ? `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}@thinkforge.in` : "entrepreneur@thinkforge.in")}
-                </span>
+            <div>
+              <h3 className="font-bold text-lg text-slate-900">{name}</h3>
+              <p className="text-xs text-brand-700 font-semibold">{t("prof_rural_micro_ent")}</p>
+              <div className="mt-1">
+                <EvidenceBadge type="VERIFIED" />
               </div>
             </div>
 
-            {/* Highlighted Business & Operational Profile */}
-            <div className="pt-4 border-t border-slate-100 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Profile Parameters</span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Active Dossier</span>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                {/* Location */}
-                <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/60 flex items-start gap-2.5 transition-all hover:bg-emerald-50">
-                  <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <MapPin className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800/70 block">Location</span>
-                    <span className="font-semibold text-slate-900 truncate block text-xs">
-                      {profile?.district 
-                        ? `${profile.block ? profile.block + ", " : ""}${profile.district}, ${profile.state || ""}` 
-                        : (profile?.location || "Wardha, Maharashtra")}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Target Sector */}
-                <div className="p-2.5 rounded-xl bg-teal-50/70 border border-teal-200/60 flex items-start gap-2.5 transition-all hover:bg-teal-50">
-                  <div className="w-6 h-6 rounded-lg bg-teal-500/10 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Briefcase className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800/70 block">Target Sector</span>
-                    <span className="font-semibold text-slate-900 truncate block text-xs">
-                      {profile?.sectorInterest || "Agro-Processing & Crafts"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Available Equity */}
-                <div className="p-2.5 rounded-xl bg-brand-50/70 border border-brand-200/60 flex items-start gap-2.5 transition-all hover:bg-brand-50">
-                  <div className="w-6 h-6 rounded-lg bg-brand-500/10 text-brand-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <IndianRupee className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-800/70 block">Available Equity</span>
-                    <span className="font-semibold text-slate-900 truncate block text-xs">
-                      {profile?.ownEquity || "₹1,50,000"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Risk Appetite */}
-                <div className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/60 flex items-start gap-2.5 transition-all hover:bg-amber-50">
-                  <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
-                    <Shield className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800/70 block">Risk Appetite</span>
-                    <span className="font-semibold text-slate-900 truncate block text-xs">
-                      {profile?.riskAppetite || "Moderate (Calculated)"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Statutory & Verification Credentials Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-card space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                Compliance & Verification
-              </span>
-              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
-                100% Verified
+          <div className="pt-4 border-t border-slate-100 space-y-3 text-xs">
+            <div>
+              <span className="text-slate-400 block font-medium">{t("prof_location")}</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? `${profile.block || t("prof_unknown")}, ${profile.district || t("prof_unknown")}, ${profile.state || t("prof_unknown")}` : t("loading")}
               </span>
             </div>
-
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Aadhaar e-KYC</span>
-                <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Verified
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Udyam Registration</span>
-                <span className="font-semibold text-brand-700">Eligible (Micro)</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Bank Account & Mandate</span>
-                <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Active (DBT Ready)
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-slate-600 font-medium">Credit Bureau Check</span>
-                <span className="font-semibold text-slate-800">Prime (740 CIBIL)</span>
-              </div>
+            <div>
+              <span className="text-slate-400 block font-medium">{t("prof_target_sector")}</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? profile.sectorInterest || t("prof_not_specified") : t("loading")}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block font-medium">{t("prof_avail_equity")}</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? profile.ownEquity || t("prof_not_specified") : t("loading")}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block font-medium">{t("prof_risk_appetite")}</span>
+              <span className="font-semibold text-slate-800">
+                {profile ? profile.riskAppetite || t("prof_not_specified") : t("loading")}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Right 2 Columns: Capability Breakdown & Matched Opportunities */}
-        <div className="md:col-span-2 space-y-6">
-          {/* Readiness Breakdown Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-card space-y-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-base text-slate-900">Capability Readiness Breakdown</h3>
-                <p className="text-xs text-slate-500 mt-0.5">Multi-pillar operational and financial assessment</p>
+        {/* Readiness Breakdown */}
+        <div className="md:col-span-2 bg-white rounded-2xl border border-slate-200 p-6 shadow-card">
+          <h3 className="font-bold text-base text-slate-900 mb-4">{t("prof_readiness_breakdown")}</h3>
+          <div className="space-y-4 text-xs">
+            <div>
+              <div className="flex items-center justify-between mb-1.5 font-semibold">
+                <span className="text-slate-700">{t("prof_fin_readiness")}</span>
+                <span className="text-brand-700">82%</span>
+              </div>
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-brand-600 h-2 rounded-full" style={{ width: "82%" }} />
               </div>
               <EvidenceBadge type="DERIVED" />
             </div>
 
-            <div className="space-y-4 text-xs">
-              <div>
-                <div className="flex items-center justify-between mb-1.5 font-semibold">
-                  <span className="text-slate-700">Financial Readiness (Equity + Collateral)</span>
-                  <span className="text-brand-700 font-bold">82%</span>
-                </div>
-                <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                  <div className="bg-brand-600 h-2.5 rounded-full" style={{ width: "82%" }} />
-                </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5 font-semibold">
+                <span className="text-slate-700">{t("prof_tech_skill")}</span>
+                <span className="text-emerald-700">75%</span>
               </div>
 
               <div>
@@ -328,19 +220,10 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Quick Metrics Bar at Bottom of Card */}
-            <div className="pt-4 border-t border-slate-100 grid grid-cols-3 gap-3">
-              <div className="bg-slate-50 p-3 rounded-xl text-center border border-slate-100">
-                <span className="text-[10px] font-medium text-slate-500 block uppercase">Readiness Tier</span>
-                <span className="font-bold text-sm text-brand-700">Tier 1 Prime</span>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-xl text-center border border-slate-100">
-                <span className="text-[10px] font-medium text-slate-500 block uppercase">Leverage Ratio</span>
-                <span className="font-bold text-sm text-emerald-700">2.4x Multiplier</span>
-              </div>
-              <div className="bg-slate-50 p-3 rounded-xl text-center border border-slate-100">
-                <span className="text-[10px] font-medium text-slate-500 block uppercase">Synergy Index</span>
-                <span className="font-bold text-sm text-teal-700">88 / 100</span>
+            <div>
+              <div className="flex items-center justify-between mb-1.5 font-semibold">
+                <span className="text-slate-700">{t("prof_phys_infra")}</span>
+                <span className="text-teal-700">85%</span>
               </div>
             </div>
           </div>
@@ -541,10 +424,10 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-teal-50/70 border border-teal-200/60">
-              <div className="font-semibold text-teal-900">Gap: Cold Storage Transport</div>
-              <div className="text-[11px] text-teal-800/80 mt-0.5">
-                Solution: Shared reefers with Wardha Agro FPO within 5km.
+            <div>
+              <div className="flex items-center justify-between mb-1.5 font-semibold">
+                <span className="text-slate-700">{t("prof_market_access")}</span>
+                <span className="text-amber-700">70%</span>
               </div>
             </div>
 

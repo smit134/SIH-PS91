@@ -3,13 +3,14 @@
 import React from "react";
 import Link from "next/link";
 import EvidenceBadge from "@/components/EvidenceBadge";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Sparkles,
   MapPin,
   TrendingUp,
   IndianRupee,
   Compass,
-  Users2,
+  Handshake,
   ShieldCheck,
   CheckCircle2,
   Clock,
@@ -24,66 +25,147 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
   const [profile, setProfile] = React.useState<any>(null);
   const [userName, setUserName] = React.useState<string>("Rural Entrepreneur");
+  const [partnerCount, setPartnerCount] = React.useState<number | null>(null);
+  const [partnerSubtext, setPartnerSubtext] = React.useState<string>(t("dash_scanning_local"));
+  const [oppCount, setOppCount] = React.useState<number | null>(null);
+  const [oppSubtext, setOppSubtext] = React.useState<string>(t("dash_analyzing_feas"));
 
   React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem("thinkforge_profile");
-      if (stored) {
-        setProfile(JSON.parse(stored));
+    const updateDashboardProfile = () => {
+      try {
+        const stored = localStorage.getItem("thinkforge_profile");
+        let parsedProfile = null;
+        if (stored) {
+          parsedProfile = JSON.parse(stored);
+          setProfile(parsedProfile);
+        }
+        const name = localStorage.getItem("thinkforge_name");
+        if (name) {
+          setUserName(name);
+        }
+
+        // Fetch partners to match the partner section
+        const rawProfile = parsedProfile || {};
+        const mappedProfile = {
+          user_id: "demo_user",
+          name: "Rural Entrepreneur",
+          available_capital: rawProfile.ownEquity ? parseInt(rawProfile.ownEquity.replace(/[^0-9]/g, "")) : 150000,
+          skills: [rawProfile.primarySkill || "Agri-Processing"],
+          experience_years: 2.0,
+          resources: [rawProfile.landAccess || "Owned", rawProfile.powerSupply || "3-Phase"],
+          interests: [rawProfile.sectorInterest || "Post-Harvest"],
+          location: {
+            latitude: 20.7453,
+            longitude: 78.6022,
+            village_or_town: rawProfile.block || "Deoli",
+            district: rawProfile.district || "Wardha",
+            state: rawProfile.state || "Maharashtra",
+            service_radius_km: 15.0
+          },
+          risk_preference: "Medium",
+          has_transport_access: !!rawProfile.transportVehicle,
+          has_market_connections: false,
+          has_digital_tools: true
+        };
+
+        fetch("http://localhost:8000/api/intelligence/partner/recommendations?max_radius_km=50", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(mappedProfile)
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setPartnerCount(data.length);
+              const types = data.map(p => {
+                if (p.investment_range_str) {
+                  if (p.investment_range_str.includes("₹")) return p.type || "Local Partner";
+                  return p.investment_range_str;
+                }
+                return p.type || "Local Partner";
+              });
+              const counts: Record<string, number> = {};
+              types.forEach(t => counts[t] = (counts[t] || 0) + 1);
+              const summary = Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(", ");
+              setPartnerSubtext(summary || t("dash_local_conn"));
+            }
+          })
+          .catch(e => console.error("Failed to fetch dashboard partners", e));
+
+        fetch("http://localhost:8000/api/intelligence/opportunity/recommendations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(mappedProfile)
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setOppCount(data.length);
+              if (data.length > 0) {
+                const bestOpp = data[0].business_name || data[0].title || "Agri-Tech";
+                setOppSubtext(`${t("dash_highest_fit")} ${bestOpp}`);
+              } else {
+                setOppSubtext(t("dash_no_viable"));
+              }
+            }
+          })
+          .catch(e => console.error("Failed to fetch dashboard opportunities", e));
+
+      } catch (e) {
+        console.error(e);
       }
-      const name = localStorage.getItem("thinkforge_name");
-      if (name) {
-        setUserName(name);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+    };
+
+    updateDashboardProfile();
+    window.addEventListener("profileUpdated", updateDashboardProfile);
+    return () => window.removeEventListener("profileUpdated", updateDashboardProfile);
   }, []);
 
   const kpiData = [
     {
-      title: "Profile Readiness",
+      title: t("dash_kpi_profile_readiness"),
       value: profile ? "100%" : "78%",
-      subtext: profile ? "Profile Complete & Calibrated" : "High Feasibility Tier • Tier 1 Verified",
-      trend: "+12% from initial intake",
+      subtext: profile ? t("dash_kpi_sub_profile_complete") : t("dash_kpi_sub_high_feasibility"),
+      trend: t("dash_kpi_trend_initial"),
       evidence: "DERIVED" as const,
       icon: TrendingUp,
       accent: "text-brand-600 bg-brand-50 border-brand-200/80",
     },
     {
-      title: "Available Capital",
+      title: t("dash_kpi_available_capital"),
       value: profile?.ownEquity || "₹2,50,000",
-      subtext: profile ? `Equity + Eligible Credit` : "₹1.50L Equity + ₹1.00L Eligible Credit",
-      trend: "31.2% Equity Leverage",
+      subtext: profile ? t("dash_kpi_sub_equity_credit") : t("dash_kpi_sub_equity_credit_default"),
+      trend: t("dash_kpi_trend_leverage"),
       evidence: "VERIFIED" as const,
       icon: IndianRupee,
       accent: "text-emerald-600 bg-emerald-50 border-emerald-200/80",
     },
     {
-      title: "Recommended Opportunities",
-      value: "4 Viable",
-      subtext: profile ? `Top: ${profile.sectorInterest?.split(' ')[0]}...` : "Top: Solar Cold Sorting (89% Fit)",
-      trend: "2 High Market Demand",
+      title: t("dash_kpi_viable_opps"),
+      value: oppCount !== null ? `${oppCount} ${t("dash_kpi_matches")}` : `4 ${t("dash_kpi_matches")}`,
+      subtext: oppCount !== null ? oppSubtext : (profile ? `Top: ${profile.sectorInterest?.split(' ')[0]}...` : t("dash_kpi_sub_top_solar")),
+      trend: t("dash_kpi_trend_demand"),
       evidence: "DERIVED" as const,
       icon: Compass,
       accent: "text-teal-600 bg-teal-50 border-teal-200/80",
     },
     {
-      title: "Potential Partners",
-      value: "7 Matched",
-      subtext: "3 FPOs, 2 Cold Stores, 2 SHGs",
-      trend: profile ? `Within ${profile.mandiDistance}` : "All within 20km radius",
+      title: t("dash_kpi_potential_partners"),
+      value: partnerCount !== null ? `${partnerCount} ${t("dash_kpi_matched")}` : `7 ${t("dash_kpi_matched")}`,
+      subtext: partnerCount !== null ? partnerSubtext : t("3 FPOs, 2 Cold Stores, 2 SHGs"),
+      trend: profile && profile.mandiDistance ? `${t("Within")} ${t(profile.mandiDistance)}` : t("All within 20km radius"),
       evidence: "VERIFIED" as const,
-      icon: Users2,
+      icon: Handshake,
       accent: "text-blue-600 bg-blue-50 border-blue-200/80",
     },
     {
-      title: "Evidence Coverage",
+      title: t("dash_kpi_evidence"),
       value: "84%",
-      subtext: "Official Mandi APMC & MoSJE Data",
-      trend: "Zero Hallucinated Specs",
+      subtext: t("Official Mandi APMC & MoSJE Data"),
+      trend: t("Zero Hallucinated Specs"),
       evidence: "VERIFIED" as const,
       icon: ShieldCheck,
       accent: "text-emerald-700 bg-emerald-50 border-emerald-300",
@@ -92,23 +174,23 @@ export default function DashboardPage() {
 
   const actions = [
     {
-      title: "Confirm PMEGP 35% Subsidy Scheme Eligibility",
-      deadline: "Priority 1 • Immediate",
-      impact: "+₹1.68L Grant Eligible",
+      title: t("dash_pmegp_eligibility"),
+      deadline: t("dash_priority_immediate"),
+      impact: t("dash_grant_eligible"),
       status: "Ready to Apply",
       href: "/schemes",
     },
     {
-      title: "Schedule Equipment Inspection with Wardha FPO",
-      deadline: "Priority 2 • Within 7 Days",
-      impact: "Saves ₹85,000 in Capex",
+      title: t("dash_equipment_inspection"),
+      deadline: t("dash_within_7_days"),
+      impact: t("dash_saves_capex"),
       status: "Pending Connection",
       href: "/partners",
     },
     {
-      title: "Lock Power Tariff with MSEDCL (Rural 3-Phase)",
-      deadline: "Priority 3 • Month 1",
-      impact: "Reduces Monthly OPEX 18%",
+      title: t("dash_lock_power"),
+      deadline: t("dash_month_1"),
+      impact: t("dash_reduces_opex"),
       status: "Document Verified",
       href: "/local-insights",
     },
@@ -119,27 +201,26 @@ export default function DashboardPage() {
       {/* 1. Header View */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div className="space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
+          <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-              Namaste, {userName} 👋
+              {t("dash_welcome")}, {userName.split(" ")[0]}!
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Active Entrepreneur Session
-            </span>
+            <p className="mt-1 text-sm text-slate-500">
+              {t("dash_overview")}
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-600">
             {/* Location Badge */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium">
               <MapPin className="w-3.5 h-3.5 text-brand-600 shrink-0" />
-              <span>Wardha District, Maharashtra (Semi-Arid Agro-Cluster)</span>
+              <span>{t("dash_wardha_district")}</span>
             </div>
 
             {/* Profile Summary Pill */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-brand-50 text-brand-800 font-medium border border-brand-200/60">
               <Sparkles className="w-3.5 h-3.5 text-brand-600 shrink-0" />
-              <span>Agri-Processing & Solar Cold Chain • ₹1.5L Equity</span>
+              <span>{t("dash_agri_solar")}</span>
             </div>
           </div>
         </div>
@@ -151,7 +232,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all"
           >
             <Edit3 className="w-3.5 h-3.5 text-slate-500" />
-            <span>Recalibrate Profile</span>
+            <span>{t("dash_recalibrate")}</span>
           </Link>
 
           <Link
@@ -159,7 +240,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900 shadow-sm transition-all"
           >
             <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
-            <span>Simulate Numbers</span>
+            <span>{t("dash_simulate")}</span>
           </Link>
 
           <Link
@@ -167,7 +248,7 @@ export default function DashboardPage() {
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-brand-600 to-teal-700 text-white hover:opacity-95 shadow-glow-teal transition-all"
           >
             <FileDown className="w-3.5 h-3.5 text-emerald-200" />
-            <span>Download Bank Dossier</span>
+            <span>{t("dash_download_dossier")}</span>
           </Link>
         </div>
       </div>
@@ -217,13 +298,13 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-brand-600" />
-              <h3 className="font-bold text-base text-slate-900">Top Opportunities</h3>
+              <h3 className="font-bold text-base text-slate-900">{t("dash_top_opps")}</h3>
             </div>
             <Link
               href="/opportunities"
               className="text-xs font-bold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1"
             >
-              View All 4
+              {t("dash_view_all")}
               <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -233,32 +314,32 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
                 <div>
-                  <p className="text-xs font-bold text-slate-900">Solar Cold Chain</p>
-                  <p className="text-[10px] text-slate-500">Highest viability match</p>
+                  <p className="text-xs font-bold text-slate-900">{t("dash_solar_chain")}</p>
+                  <p className="text-[10px] text-slate-500">{t("dash_highest_viability")}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-emerald-600">89% Fit</p>
-                  <p className="text-[10px] text-slate-500">₹3.5L Capex</p>
+                  <p className="text-xs font-bold text-emerald-600">89% {t("dash_fit")}</p>
+                  <p className="text-[10px] text-slate-500">₹3.5L {t("dash_capex")}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
                 <div>
-                  <p className="text-xs font-bold text-slate-900">Agri-Briquette Plant</p>
-                  <p className="text-[10px] text-slate-500">Strong market demand</p>
+                  <p className="text-xs font-bold text-slate-900">{t("dash_agri_briquette")}</p>
+                  <p className="text-[10px] text-slate-500">{t("dash_strong_market")}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-brand-600">83% Fit</p>
-                  <p className="text-[10px] text-slate-500">₹2.2L Capex</p>
+                  <p className="text-xs font-bold text-brand-600">83% {t("dash_fit")}</p>
+                  <p className="text-[10px] text-slate-500">₹2.2L {t("dash_capex")}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-100">
                 <div>
-                  <p className="text-xs font-bold text-slate-900">Fiber Extraction Unit</p>
-                  <p className="text-[10px] text-slate-500">Niche rural sector</p>
+                  <p className="text-xs font-bold text-slate-900">{t("dash_fiber_extract")}</p>
+                  <p className="text-[10px] text-slate-500">{t("dash_niche_rural")}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-bold text-teal-600">78% Fit</p>
-                  <p className="text-[10px] text-slate-500">₹1.8L Capex</p>
+                  <p className="text-xs font-bold text-teal-600">78% {t("dash_fit")}</p>
+                  <p className="text-[10px] text-slate-500">₹1.8L {t("dash_capex")}</p>
                 </div>
               </div>
             </div>
@@ -270,7 +351,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Radar className="w-4 h-4 text-emerald-600" />
-              <h3 className="font-bold text-base text-slate-900">Capability Scorecard</h3>
+              <h3 className="font-bold text-base text-slate-900">{t("dash_cap_scorecard")}</h3>
             </div>
             <EvidenceBadge type="DERIVED" />
           </div>
@@ -279,7 +360,7 @@ export default function DashboardPage() {
           <div className="flex-1 min-h-[260px] rounded-xl border border-slate-200 bg-white p-5 flex flex-col justify-center space-y-5">
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-slate-700">Financial Capacity</span>
+                <span className="font-semibold text-slate-700">{t("dash_fin_capacity")}</span>
                 <span className="font-bold text-brand-700">82%</span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
@@ -288,7 +369,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-slate-700">Technical Expertise</span>
+                <span className="font-semibold text-slate-700">{t("dash_tech_expertise")}</span>
                 <span className="font-bold text-emerald-700">75%</span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
@@ -297,7 +378,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-slate-700">Infrastructure Assets</span>
+                <span className="font-semibold text-slate-700">{t("dash_infra_assets")}</span>
                 <span className="font-bold text-teal-700">85%</span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
@@ -306,7 +387,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-slate-700">Risk Resilience</span>
+                <span className="font-semibold text-slate-700">{t("dash_risk_resil")}</span>
                 <span className="font-bold text-blue-700">60%</span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2">
@@ -316,18 +397,18 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Placeholder 3: Local Insights (Map) */}
+        {/* Placeholder 3: Local Insights (Map) */ }
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-card flex flex-col">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <MapPinned className="w-4 h-4 text-teal-600" />
-              <h3 className="font-bold text-base text-slate-900">Local Insights</h3>
+              <h3 className="font-bold text-base text-slate-900">{t("dash_local_insights")}</h3>
             </div>
             <Link
               href="/local-insights"
               className="text-xs font-bold text-brand-700 hover:text-brand-800 inline-flex items-center gap-1"
             >
-              Explore Map
+              {t("dash_explore_map")}
               <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -346,13 +427,13 @@ export default function DashboardPage() {
             
             <div className="mt-auto relative z-10 flex flex-wrap items-center justify-center gap-3 p-3 bg-white/90 backdrop-blur-md border-t border-slate-200 text-[10px] font-semibold text-slate-700 pointer-events-none">
               <span className="inline-flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" /> Mandi: 14km
+                <span className="w-2 h-2 rounded-full bg-emerald-500" /> {t("dash_mandi_14km")}
               </span>
               <span className="inline-flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-blue-500" /> 3 FPOs Nearby
+                <span className="w-2 h-2 rounded-full bg-blue-500" /> {t("dash_3_fpos")}
               </span>
               <span className="inline-flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-amber-500" /> Low Saturation
+                <span className="w-2 h-2 rounded-full bg-amber-500" /> {t("dash_low_sat")}
               </span>
             </div>
           </div>
@@ -363,10 +444,10 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <ListTodo className="w-4 h-4 text-brand-600" />
-              <h3 className="font-bold text-base text-slate-900">Recommended Actions</h3>
+              <h3 className="font-bold text-base text-slate-900">{t("dash_rec_actions")}</h3>
             </div>
             <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-              3 Steps Pending
+              3 {t("dash_steps_pending")}
             </span>
           </div>
 
@@ -375,10 +456,10 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold tracking-wider uppercase text-slate-400">
-                  [ Layout Placeholder ]
+                  {t("dash_layout_placeholder")}
                 </span>
                 <span className="text-[11px] font-bold text-slate-500">
-                  Prioritized Implementation Roadmap
+                  {t("dash_prioritized_roadmap")}
                 </span>
               </div>
 
@@ -414,8 +495,8 @@ export default function DashboardPage() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
-              <span>Automated by ThinkForge Decision Engine</span>
-              <span className="font-bold text-brand-700">Next Review: 17 Sep 2026</span>
+              <span>{t("dash_automated_by")}</span>
+              <span className="font-bold text-brand-700">{t("dash_next_review")}</span>
             </div>
           </div>
         </div>

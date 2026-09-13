@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Compass,
-  Users2,
+  Handshake,
   WalletCards,
   Landmark,
   MapPinned,
@@ -16,8 +16,10 @@ import {
   ShieldCheck,
   ChevronRight,
   X,
+  Languages,
 } from "lucide-react";
 import clsx from "clsx";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface NavItem {
   name: string;
@@ -29,7 +31,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Opportunities", href: "/opportunities", icon: Compass, badge: "4 Viable" },
-  { name: "Partners", href: "/partners", icon: Users2, badge: "7" },
+  { name: "Partners", href: "/partners", icon: Handshake, badge: "7" },
   { name: "Finance", href: "/finance", icon: WalletCards },
   { name: "Schemes", href: "/schemes", icon: Landmark, badge: "PMEGP" },
   { name: "Local Insights", href: "/local-insights", icon: MapPinned },
@@ -44,6 +46,93 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
+  const { language, setLanguage, t } = useLanguage();
+  
+  const [userName, setUserName] = React.useState("Ramesh Kumar");
+  const [userInitials, setUserInitials] = React.useState("RK");
+  const [userLoc, setUserLoc] = React.useState("Wardha, MH • Agri-Cluster");
+  const [partnerCount, setPartnerCount] = React.useState<string>("7");
+  const [oppCount, setOppCount] = React.useState<string>("4 Viable");
+
+  React.useEffect(() => {
+    const updateProfile = () => {
+      const name = localStorage.getItem("thinkforge_name");
+      if (name) {
+        setUserName(name);
+        const parts = name.trim().split(" ");
+        if (parts.length >= 2) {
+          setUserInitials((parts[0][0] + parts[1][0]).toUpperCase());
+        } else if (name.length >= 2) {
+          setUserInitials(name.substring(0, 2).toUpperCase());
+        }
+      }
+
+      const profileStr = localStorage.getItem("thinkforge_profile");
+      if (profileStr) {
+        try {
+          const p = JSON.parse(profileStr);
+          if (p.district) {
+            const st = p.state === "Maharashtra" ? "MH" : (p.state ? p.state.substring(0,2).toUpperCase() : "");
+            const sector = p.sectorInterest ? p.sectorInterest.split(" ")[0] : "Agri";
+            setUserLoc(`${p.district}, ${st} • ${sector}-Cluster`);
+          }
+
+          const mappedProfile = {
+            user_id: "demo_user",
+            name: t("prof_rural_entrepreneur"),
+            available_capital: p.ownEquity ? parseInt(p.ownEquity.replace(/[^0-9]/g, "")) : 150000,
+            skills: [p.primarySkill || "Agri-Processing"],
+            experience_years: 2.0,
+            resources: [p.landAccess || "Owned", p.powerSupply || "3-Phase"],
+            interests: [p.sectorInterest || "Post-Harvest"],
+            location: {
+              latitude: 20.7453,
+              longitude: 78.6022,
+              village_or_town: p.block || "Deoli",
+              district: p.district || "Wardha",
+              state: p.state || "Maharashtra",
+              service_radius_km: 15.0
+            },
+            risk_preference: "Medium",
+            has_transport_access: !!p.transportVehicle,
+            has_market_connections: false,
+            has_digital_tools: true
+          };
+
+          fetch("http://localhost:8000/api/intelligence/partner/recommendations?max_radius_km=50", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(mappedProfile)
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (Array.isArray(data)) {
+                setPartnerCount(data.length.toString());
+              }
+            })
+            .catch(e => console.error("Failed to fetch sidebar partners", e));
+
+          fetch("http://localhost:8000/api/intelligence/opportunity/recommendations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(mappedProfile)
+          })
+            .then(res => res.json())
+            .then(data => {
+              if (Array.isArray(data)) {
+                setOppCount(`${data.length} ${t("sidebar_viable")}`);
+              }
+            })
+            .catch(e => console.error("Failed to fetch sidebar opportunities", e));
+
+        } catch (e) {}
+      }
+    };
+
+    updateProfile();
+    window.addEventListener("profileUpdated", updateProfile);
+    return () => window.removeEventListener("profileUpdated", updateProfile);
+  }, [pathname]);
 
   return (
     <>
@@ -83,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 font-medium leading-none mt-1">
-                MoSJE Rural Advisory AI
+                {t("sidebar_mosje_desc")}
               </p>
             </div>
           </Link>
@@ -100,27 +189,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
           )}
         </div>
 
-        {/* Evidence Status Pill */}
+        {/* Evidence Status Pill & Language Switcher */}
         <div className="px-5 py-2.5 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-xs">
-          <span className="text-slate-500 font-medium flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-brand-600" />
-            System Mode
-          </span>
-          <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[11px] border border-emerald-200/80">
-            Decision Cockpit
-          </span>
+            <span className="text-slate-500 font-medium hidden sm:inline">{t("sidebar_system_mode")}</span>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-[11px] border border-emerald-200/80">
+              {t("sidebar_decision_cockpit")}
+            </span>
+            
+            <button
+              onClick={() => setLanguage(language === "en" ? "hi" : "en")}
+              className="flex items-center gap-1 px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors"
+              title="Toggle Language"
+            >
+              <Languages className="w-3.5 h-3.5" />
+              <span className="font-bold text-[10px] uppercase">{language}</span>
+            </button>
+          </div>
         </div>
 
         {/* Navigation Links */}
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
           <div className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Platform Navigation
+            {t("sidebar_platform_nav")}
           </div>
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               pathname === item.href ||
               (item.href !== "/dashboard" && pathname?.startsWith(item.href));
+            
+            let badgeValue = item.badge;
+            if (item.name === "Partners") badgeValue = partnerCount;
+            if (item.name === "Opportunities") badgeValue = oppCount;
 
             return (
               <Link
@@ -141,11 +246,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
                       isActive ? "text-emerald-200" : "text-slate-400 group-hover:text-brand-600"
                     )}
                   />
-                  <span>{item.name}</span>
+                  <span>
+                    {item.name === "Dashboard" && t("nav_dashboard")}
+                    {item.name === "Opportunities" && t("nav_opportunities")}
+                    {item.name === "Partners" && t("nav_partners")}
+                    {item.name === "Finance" && t("nav_finance")}
+                    {item.name === "Schemes" && t("nav_schemes")}
+                    {item.name === "Local Insights" && t("nav_local_insights")}
+                    {item.name === "Reports" && t("nav_reports")}
+                    {item.name === "Profile" && t("nav_profile")}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  {item.badge && (
+                  {badgeValue && (
                     <span
                       className={clsx(
                         "text-[10px] px-2 py-0.5 rounded-full font-semibold",
@@ -154,7 +268,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
                           : "bg-brand-50 text-brand-700 border border-brand-200"
                       )}
                     >
-                      {item.badge}
+                      {badgeValue}
                     </span>
                   )}
                   {isActive && <ChevronRight className="w-4 h-4 text-emerald-200" />}
@@ -172,17 +286,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
             className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-brand-500 hover:shadow-sm transition-all group"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 text-emerald-400 font-bold flex items-center justify-center text-sm shadow-sm ring-2 ring-emerald-500/20">
-              RK
+              {userInitials}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-slate-900 truncate">Ramesh Kumar</p>
+                <p className="text-sm font-semibold text-slate-900 truncate">{userName}</p>
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <p className="text-[11px] text-slate-500 truncate">Wardha, MH • Agri-Cluster</p>
+              <p className="text-[11px] text-slate-500 truncate">{userLoc}</p>
               <div className="mt-1 flex items-center gap-1.5">
                 <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                  Readiness: 78%
+                  {t("sidebar_readiness")} 78%
                 </span>
               </div>
             </div>
