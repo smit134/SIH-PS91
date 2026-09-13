@@ -5,15 +5,17 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { Menu, Sparkles, UserCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function ShellWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // If on the registration page, provide a focused registration shell
-  const isRegisterPage = pathname === "/register";
+  // If on the registration or auth page, provide a focused shell without sidebar
+  const isAuthPage = pathname === "/register" || pathname === "/auth";
 
-  if (isRegisterPage) {
+  if (isAuthPage) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white">
         {/* Focused Registration Header */}
@@ -33,14 +35,11 @@ export default function ShellWrapper({ children }: { children: React.ReactNode }
           </Link>
 
           <div className="flex items-center gap-3 text-sm">
-            <span className="hidden sm:inline text-slate-400 text-xs font-medium">
-              Already registered?
-            </span>
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700 transition-colors"
             >
-              Go to Dashboard
+              {t("shell_go_dashboard")}
               <ArrowRight className="w-3.5 h-3.5 text-brand-400" />
             </Link>
           </div>
