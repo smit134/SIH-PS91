@@ -37,10 +37,14 @@ from app.models import (
 def db_session():
     """In-memory SQLite synchronous session fixture for schema validation."""
     engine = create_engine("sqlite:///:memory:", echo=False)
-    Base.metadata.create_all(engine)
+    sqlite_tables = [
+        t for name, t in Base.metadata.tables.items()
+        if name not in ("osm_pois", "scheme_document_chunks")
+    ]
+    Base.metadata.create_all(engine, tables=sqlite_tables)
     with Session(engine) as session:
         yield session
-    Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(engine, tables=sqlite_tables)
 
 
 def test_schema_metadata_contains_all_core_tables():

@@ -1,0 +1,104 @@
+{
+  "handicraft_textiles": {
+    "median_monthly_revenue": 45000,
+    "median_monthly_expenses": 28000,
+    "avg_working_capital_ratio": 0.35,
+    "avg_payment_delay_days": 15,
+    "expense_breakdown": {
+      "materials": 0.5,
+      "labor": 0.3,
+      "overhead": 0.2
+    },
+    "revenue_variance_20pct": {
+      "low": 36000,
+      "high": 54000
+    },
+    "sample_size": 0,
+    "median_invoice_amount": 5000
+  },
+  "garment_tailoring_unit": {
+    "median_monthly_revenue": 60000,
+    "median_monthly_expenses": 38000,
+    "avg_working_capital_ratio": 0.3,
+    "avg_payment_delay_days": 10,
+    "expense_breakdown": {
+      "materials": 0.45,
+      "labor": 0.35,
+      "overhead": 0.2
+    },
+    "revenue_variance_20pct": {
+      "low": 48000,
+      "high": 72000
+    },
+    "sample_size": 0,
+    "median_invoice_amount": 3500
+  },
+  "food_processing_spices": {
+    "median_monthly_revenue": 80000,
+    "median_monthly_expenses": 52000,
+    "avg_working_capital_ratio": 0.4,
+    "avg_payment_delay_days": 20,
+    "expense_breakdown": {
+      "materials": 0.55,
+      "labor": 0.25,
+      "overhead": 0.2
+    },
+    "revenue_variance_20pct": {
+      "low": 64000,
+      "high": 96000
+    },
+    "sample_size": 0,
+    "median_invoice_amount": 8000
+  },
+  "dairy_micro_farm": {
+    "median_monthly_revenue": 70000,
+    "median_monthly_expenses": 45000,
+    "avg_working_capital_ratio": 0.38,
+    "avg_payment_delay_days": 5,
+    "expense_breakdown": {
+      "materials": 0.5,
+      "labor": 0.28,
+      "overhead": 0.22
+    },
+    "revenue_variance_20pct": {
+      "low": 56000,
+      "high": 84000
+    },
+    "sample_size": 0,
+    "median_invoice_amount": 2500
+  },
+  "vermicompost_production": {
+    "median_monthly_revenue": 35000,
+    "median_monthly_expenses": 18000,
+    "avg_working_capital_ratio": 0.25,
+    "avg_payment_delay_days": 12,
+    "expense_breakdown": {
+      "materials": 0.35,
+      "labor": 0.4,
+      "overhead": 0.25
+    },
+    "revenue_variance_20pct": {
+      "low": 28000,
+      "high": 42000
+    },
+    "sample_size": 0,
+    "median_invoice_amount": 4000
+  },
+  "organic_farm_inputs": {
+    "median_monthly_revenue": 50000,
+    "median_monthly_expenses": 30000,
+    "avg_working_capital_ratio": 0.32,
+    "avg_payment_delay_days": 18,
+    "expense_breakdown": {
+      "materials": 0.4,
+      "labor": 0.35,
+      "overhead": 0.25
+    },
+    "revenue_variance_20pct": {
+      "low": 40000,
+      "high": 60000
+    },
+    "sample_size": 0,
+    "median_invoice_amount": 6000
+  }
+}

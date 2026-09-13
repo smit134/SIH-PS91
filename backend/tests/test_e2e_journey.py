@@ -41,9 +41,11 @@ async def test_full_entrepreneur_e2e_lifecycle(client, test_db_session):
     assert otp_send_res.status_code == 200
     assert otp_send_res.json()["is_registered_user"] is True
 
+    from app.core.otp import otp_manager
+    actual_code = otp_manager._store[phone].code
     otp_verify_res = await client.post(
         "/api/v1/auth/otp/verify",
-        json={"phone": phone, "otp_code": "999999"},
+        json={"phone": phone, "otp_code": actual_code},
     )
     assert otp_verify_res.status_code == 200
 

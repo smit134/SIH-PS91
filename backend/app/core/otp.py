@@ -57,8 +57,12 @@ class OTPManager:
 
             record.attempts_left -= 1
 
-            # In development/test mode, "999999" is also accepted as master bypass
-            if input_code == record.code or input_code == "999999":
+            from app.config import settings
+            is_valid = input_code == record.code
+            if not is_valid and getattr(settings, "ALLOW_DEV_OTP_BYPASS", False):
+                is_valid = (input_code == "999999")
+
+            if is_valid:
                 del self._store[phone]
                 return True
 

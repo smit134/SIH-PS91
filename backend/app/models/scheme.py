@@ -80,3 +80,27 @@ class GovernmentScheme(Base):
         nullable=False,
         comment="Whether the scheme is currently active for application routing",
     )
+
+    # --- New columns for real dataset integration ---
+    scheme_level: Mapped[Optional[str]] = mapped_column(
+        String(20),
+        default="CENTRAL",
+        nullable=True,
+        comment="CENTRAL or STATE level scheme",
+    )
+    target_state: Mapped[Optional[str]] = mapped_column(
+        String(100),
+        nullable=True,
+        comment="Target state (NULL for central schemes)",
+    )
+    category_tags: Mapped[Optional[List[str]]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=True,
+        comment='Category tags: ["agriculture", "msme", "women", "sc_st"]',
+    )
+    benefits_text: Mapped[Optional[str]] = mapped_column(
+        Text,
+        nullable=True,
+        comment="Raw benefits description for RAG vectorization",
+    )

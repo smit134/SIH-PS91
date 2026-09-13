@@ -95,3 +95,64 @@ def simulate_scenario(input_data: SimulatorInput) -> SimulatorOutput:
         risk_level=risk_level,
         repayment_schedule=schedule
     )
+
+
+def load_financial_templates() -> dict:
+    """Loads MSME transaction-derived financial benchmark templates."""
+    import json
+    from pathlib import Path
+    
+    candidates = [
+        Path(__file__).resolve().parent.parent.parent / "data" / "financial_templates.json",
+        Path(__file__).resolve().parent.parent / "data" / "financial_templates.json",
+        Path("data/financial_templates.json"),
+    ]
+    for p in candidates:
+        if p.exists():
+            with open(p, "r", encoding="utf-8") as f:
+                return json.load(f)
+    return {}
+
+
+def get_financial_template(category_id: str) -> Optional[dict]:
+    """Returns baseline financial parameters for a business category."""
+    templates = load_financial_templates()
+    key = category_id.lower().replace("-", "_")
+    return templates.get(key)
+
+
+def stress_test_scenario(input_data: SimulatorInput, category_id: Optional[str] = None) -> dict:
+    """
+    Evaluates business viability under base, conservative (-20%), and optimistic (+20%) scenarios
+    using MSME invoice transaction volatility distributions.
+    """
+    base_output = simulate_scenario(input_data)
+    
+    # Conservative (-20% revenue, +10% variable costs)
+    conservative_assumptions = input_data.operating_assumptions.model_copy(deep=True)
+    conservative_assumptions.monthly_revenue *= 0.80
+    conservative_assumptions.monthly_variable_costs *= 1.10
+    conservative_input = input_data.model_copy(deep=True)
+    conservative_input.operating_assumptions = conservative_assumptions
+    conservative_output = simulate_scenario(conservative_input)
+    
+    # Optimistic (+20% revenue)
+    optimistic_assumptions = input_data.operating_assumptions.model_copy(deep=True)
+    optimistic_assumptions.monthly_revenue *= 1.20
+    optimistic_input = input_data.model_copy(deep=True)
+    optimistic_input.operating_assumptions = optimistic_assumptions
+    optimistic_output = simulate_scenario(optimistic_input)
+
+    template = get_financial_template(category_id) if category_id else None
+    
+    return {
+        "base_case": base_output,
+        "conservative_case": conservative_output,
+        "optimistic_case": optimistic_output,
+        "sector_benchmarks": template,
+        "working_capital_advice": {
+            "recommended_cushion_months": 3,
+            "avg_payment_delay_days": template.get("avg_payment_delay_days", 15) if template else 15,
+            "working_capital_ratio": template.get("avg_working_capital_ratio", 0.35) if template else 0.35,
+        }
+    }

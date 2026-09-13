@@ -4,8 +4,10 @@ Endpoints for business recommendations, 7-factor scoring, reverse search, and co
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+from ..core.database import get_db
 
 from ..models.user import EntrepreneurProfile
 from ..models.business import (
@@ -38,31 +40,31 @@ async def get_catalog():
 
 
 @router.post("/recommendations", response_model=List[BusinessFitResult], summary="Get ranked business recommendations")
-async def get_opportunity_recommendations(profile: EntrepreneurProfile):
+async def get_opportunity_recommendations(profile: EntrepreneurProfile, db: AsyncSession = Depends(get_db)):
     """
     Evaluates all business categories against the entrepreneur profile and returns
-    deterministic 7-factor fit scores with full explainability.
+    deterministic 7-factor fit scores calibrated with Gujarat district MSME statistics.
     """
-    search_res = OpportunityEngine.reverse_business_search(profile)
+    search_res = await OpportunityEngine.reverse_business_search_async(db, profile)
     return search_res.ranked_opportunities
 
 
 @router.post("/reverse-search", response_model=ReverseSearchResult, summary="USP #2: Reverse Business Search ('Resource -> Business')")
-async def reverse_business_search(profile: EntrepreneurProfile):
+async def reverse_business_search(profile: EntrepreneurProfile, db: AsyncSession = Depends(get_db)):
     """
     'What can I start with what I have?'
-    Takes skills, capital, and resources and ranks viable businesses.
+    Takes skills, capital, and resources and ranks viable businesses using district statistics.
     """
-    return OpportunityEngine.reverse_business_search(profile)
+    return await OpportunityEngine.reverse_business_search_async(db, profile)
 
 
 @router.post("/score-single", response_model=BusinessFitResult, summary="Score a single specific business category")
-async def score_single_business(request: SingleBusinessScoreRequest):
+async def score_single_business(request: SingleBusinessScoreRequest, db: AsyncSession = Depends(get_db)):
     """Calculates detailed fit score and explainability breakdown for a specific category."""
     business = get_business_by_id(request.business_id)
     if not business:
         raise HTTPException(status_code=404, detail=f"Business category '{request.business_id}' not found in catalog.")
-    return OpportunityEngine.score_business(request.profile, business)
+    return await OpportunityEngine.score_business_async(db, request.profile, business)
 
 
 @router.post("/compare", response_model=BusinessComparisonResult, summary="Compare multiple business opportunities side-by-side")

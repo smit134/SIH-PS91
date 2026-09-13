@@ -15,12 +15,12 @@ SAMPLE_PARTNERS: List[PartnerProfile] = [
         name="Ramesh Verma",
         phone="+91-98765-43210",
         location=LocationPoint(
-            latitude=20.7500,
-            longitude=78.6100,
-            village_or_town="Wardha Market",
-            district="Wardha District",
-            state="Maharashtra",
-            service_radius_km=15.0
+            latitude=28.6140,
+            longitude=77.2090,
+            village_or_town="Crafts Council Center",
+            district="Central District",
+            state="Delhi",
+            service_radius_km=30.0
         ),
         capabilities=["Marketing", "Capital", "Distribution", "Management"],
         skills=["Digital Marketing", "Wholesale Sales", "Buyer Negotiation", "Accounting"],
@@ -118,5 +118,27 @@ SAMPLE_PARTNERS: List[PartnerProfile] = [
         experience_years=7.0,
         business_interests=["handicraft_textiles", "food_processing_spices", "vermicompost_production"],
         verification_state=VerificationState.BASIC
+    ),
+
+    PartnerProfile(
+        partner_id="partner_mkt_gujarat",
+        name="Harish Patel",
+        phone="+91-98250-99887",
+        location=LocationPoint(
+            latitude=23.0225,
+            longitude=72.5714,
+            village_or_town="Manek Chowk Trade Center",
+            district="Ahmedabad",
+            state="Gujarat",
+            service_radius_km=30.0
+        ),
+        capabilities=["Distribution", "Capital", "Management"],
+        skills=["Textile Distribution", "Wholesale APMC Trade", "Credit Management"],
+        resources=["Wholesale Depot", "Commercial Transport Fleet"],
+        investment_min=100000.0,
+        investment_max=500000.0,
+        experience_years=8.0,
+        business_interests=["handicraft_textiles", "food_processing_spices", "garment_tailoring_unit"],
+        verification_state=VerificationState.VERIFIED
     )
 ]

@@ -16,8 +16,10 @@ import {
   ShieldCheck,
   ChevronRight,
   X,
+  LogOut,
 } from "lucide-react";
 import clsx from "clsx";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface NavItem {
   name: string;
@@ -44,6 +46,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   
   const [userName, setUserName] = React.useState("Ramesh Kumar");
   const [userInitials, setUserInitials] = React.useState("RK");
@@ -261,6 +264,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => 
               </div>
             </div>
           </Link>
+
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              if (onClose) onClose();
+            }}
+            className="w-full mt-2.5 flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-all cursor-pointer shadow-sm"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
     </>

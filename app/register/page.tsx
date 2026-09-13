@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   MapPin,
@@ -14,6 +14,7 @@ import {
   Sparkles,
   CheckCircle2,
   Lightbulb,
+  Save,
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -50,15 +51,23 @@ interface FormData {
 }
 
 const locationData: Record<string, Record<string, string[]>> = {
+  Gujarat: {
+    Ahmedabad: ["Sanand", "Daskroi", "Bavla", "Dholka", "Viramgam"],
+    Surat: ["Olpad", "Mangrol", "Mandvi", "Bardoli", "Kamrej"],
+    Rajkot: ["Kotda Sangani", "Gondal", "Jasdan", "Dhoraji"],
+    Vadodara: ["Padra", "Waghodia", "Karjan", "Dabhoi"],
+    Gandhinagar: ["Kalol", "Mansa", "Dehgam"],
+    Bhavnagar: ["Sihor", "Palitana", "Talaja", "Mahuva"],
+    Jamnagar: ["Dhrol", "Jodiya", "Kalavad", "Lalpur"],
+    Morbi: ["Wankaner", "Halvad", "Maliya"],
+    Bharuch: ["Ankleshwar", "Jambusar", "Hansot", "Amod"],
+    Anand: ["Petlad", "Borsad", "Khambhat", "Tarapur"],
+  },
   Maharashtra: {
     Wardha: ["Deoli Gram Panchayat", "Seloo", "Hinganghat", "Arvi"],
     Nagpur: ["Kamptee", "Hingna", "Katol"],
     Pune: ["Haveli", "Khed", "Maval"],
     Nashik: ["Malegaon", "Sinnar", "Igatpuri"]
-  },
-  Gujarat: {
-    Ahmedabad: ["Sanand", "Daskroi", "Bavla"],
-    Surat: ["Olpad", "Mangrol", "Mandvi"]
   },
   Karnataka: {
     Bengaluru: ["Anekal", "Yelahanka", "Kengeri"],
@@ -105,6 +114,42 @@ export default function RegisterPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRecalibrating, setIsRecalibrating] = useState(false);
+  const [initialLoaded, setInitialLoaded] = useState(false);
+
+  // Load existing profile from localStorage so existing data is NEVER lost during recalibration
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("thinkforge_profile");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && typeof parsed === "object") {
+            setFormData((prev) => ({
+              ...prev,
+              ...parsed,
+            }));
+            setIsRecalibrating(true);
+          }
+        } catch (e) {
+          console.error("Failed to load existing profile for recalibration", e);
+        }
+      }
+      setInitialLoaded(true);
+
+      // Check if user came to edit a specific step (?step=3)
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const stepParam = params.get("step");
+        if (stepParam) {
+          const stepNum = parseInt(stepParam, 10);
+          if (stepNum >= 1 && stepNum <= 6) {
+            setCurrentStep(stepNum);
+          }
+        }
+      } catch {}
+    }
+  }, []);
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -152,7 +197,7 @@ export default function RegisterPage() {
 
     setTimeout(() => {
       router.push("/dashboard");
-    }, 600);
+    }, 400);
   };
 
   // Dynamic readiness estimate based on step progress
@@ -162,15 +207,17 @@ export default function RegisterPage() {
     <div className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 sm:py-12 flex flex-col justify-center">
       {/* Header Banner */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-950 border border-brand-800/80 text-brand-400 text-xs font-semibold mb-3">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950 border border-emerald-700/80 text-emerald-400 text-xs font-semibold mb-3 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Smart Rural Onboarding Wizard</span>
+          <span>{isRecalibrating ? "Profile Recalibration Mode" : "Smart Rural Onboarding Wizard"}</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Entrepreneur Capability Profile
+          {isRecalibrating ? "Recalibrate Capability Profile" : "Entrepreneur Capability Profile"}
         </h1>
         <p className="mt-2 text-sm text-slate-400 max-w-xl mx-auto">
-          ThinkForge uses your grounded inputs to evaluate localized feasibility, match schemes, and synthesize a bankable roadmap.
+          {isRecalibrating
+            ? "Your previously saved profile is pre-loaded below. Change only the specific inputs you want to update—everything else remains safely preserved."
+            : "ThinkForge uses your grounded inputs to evaluate localized feasibility, match schemes, and synthesize a bankable roadmap."}
         </p>
       </div>
 
@@ -236,6 +283,26 @@ export default function RegisterPage() {
 
       {/* Interactive Form Card */}
       <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        {isRecalibrating && (
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 mb-6 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs shadow-sm">
+            <div className="flex items-center gap-2.5 text-emerald-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>
+                Existing profile loaded. Edit any field, or jump to any step above. You can save at any time without re-filling other steps.
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleComplete}
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-glow-emerald transition-all shrink-0"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span>{isSubmitting ? "Saving..." : "Save & Finish Now"}</span>
+            </button>
+          </div>
+        )}
+
         {/* Step 1: Location */}
         {currentStep === 1 && (
           <div className="space-y-5 animate-in fade-in duration-300">
@@ -703,41 +770,57 @@ export default function RegisterPage() {
         )}
 
         {/* Action Buttons */}
-        <div className="mt-8 pt-5 border-t border-slate-800 flex items-center justify-between gap-4">
-          {currentStep > 1 ? (
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Previous Step
-            </button>
-          ) : (
-            <div />
-          )}
+        <div className="mt-8 pt-5 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {currentStep > 1 && (
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-700 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Previous Step
+              </button>
+            )}
+          </div>
 
-          {currentStep < 6 ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-brand-600 text-white hover:bg-brand-500 shadow-glow-teal transition-all"
-            >
-              <span>Continue to {steps[currentStep].title}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleComplete}
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500 via-emerald-600 to-teal-600 text-white hover:opacity-95 shadow-glow-emerald transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Sparkles className="w-4 h-4 text-emerald-100" />
-              <span>{isSubmitting ? "Synthesizing Roadmap..." : "Complete & Launch Dashboard"}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {/* Quick Save button available on ANY step so user can change just 1 thing and immediately save! */}
+            {currentStep < 6 && (
+              <button
+                type="button"
+                onClick={handleComplete}
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-700/80 hover:bg-emerald-600 text-white border border-emerald-500/40 shadow-glow-emerald transition-all"
+                title="Save your changes immediately without having to walk through subsequent steps"
+              >
+                <Save className="w-4 h-4 text-emerald-200" />
+                <span>{isSubmitting ? "Saving..." : "Save & Finish Here"}</span>
+              </button>
+            )}
+
+            {currentStep < 6 ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-brand-600 text-white hover:bg-brand-500 shadow-glow-teal transition-all"
+              >
+                <span>Continue to {steps[currentStep].title}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleComplete}
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-brand-500 via-emerald-600 to-teal-600 text-white hover:opacity-95 shadow-glow-emerald transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Sparkles className="w-4 h-4 text-emerald-100" />
+                <span>{isSubmitting ? "Synthesizing Roadmap..." : (isRecalibrating ? "Save & Launch Dashboard" : "Complete & Launch Dashboard")}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

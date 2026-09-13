@@ -50,9 +50,13 @@ class AsyncTestSessionWrapper:
 def test_engine():
     """In-memory SQLite engine for all test sessions."""
     engine = create_engine("sqlite:///:memory:", echo=False)
-    Base.metadata.create_all(engine)
+    sqlite_tables = [
+        t for name, t in Base.metadata.tables.items()
+        if name not in ("osm_pois", "scheme_document_chunks")
+    ]
+    Base.metadata.create_all(engine, tables=sqlite_tables)
     yield engine
-    Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(engine, tables=sqlite_tables)
 
 
 @pytest.fixture
@@ -81,3 +85,12 @@ async def client(test_db_session):
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.pop(get_db, None)
+
+
+@pytest.fixture(autouse=True)
+def mock_sms_gateway(monkeypatch):
+    """Prevents live cellular SMS API calls during test suite runs."""
+    async def _mock_send(phone: str, otp_code: str):
+        return True, f"Mock OTP {otp_code} dispatched to {phone}"
+
+    monkeypatch.setattr("app.core.sms.send_sms_otp", _mock_send)

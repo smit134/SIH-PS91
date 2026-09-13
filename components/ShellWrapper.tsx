@@ -10,6 +10,11 @@ export default function ShellWrapper({ children }: { children: React.ReactNode }
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // If on the auth page, render clean full-screen auth layout
+  if (pathname === "/auth") {
+    return <main className="min-h-screen bg-slate-950">{children}</main>;
+  }
+
   // If on the registration page, provide a focused registration shell
   const isRegisterPage = pathname === "/register";
 

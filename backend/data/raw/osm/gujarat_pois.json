@@ -1,0 +1,122 @@
+[
+  {
+    "osm_id": 1001,
+    "name": "APMC Grain & Spice Market, Jamalpur",
+    "poi_category": "market",
+    "amenity": "marketplace",
+    "shop": "wholesale",
+    "latitude": 23.0118,
+    "longitude": 72.5802,
+    "state": "Gujarat",
+    "district": "Ahmedabad",
+    "raw_tags": "{\"name\": \"APMC Grain & Spice Market\", \"amenity\": \"marketplace\"}"
+  },
+  {
+    "osm_id": 1002,
+    "name": "State Bank of India (MSME Branch)",
+    "poi_category": "bank",
+    "amenity": "bank",
+    "shop": null,
+    "latitude": 23.0255,
+    "longitude": 72.5714,
+    "state": "Gujarat",
+    "district": "Ahmedabad",
+    "raw_tags": "{\"name\": \"State Bank of India (MSME Branch)\", \"amenity\": \"bank\"}"
+  },
+  {
+    "osm_id": 1003,
+    "name": "Ahmedabad Central Railway Freight Yard",
+    "poi_category": "transport",
+    "amenity": "bus_station",
+    "shop": null,
+    "latitude": 23.0238,
+    "longitude": 72.6012,
+    "state": "Gujarat",
+    "district": "Ahmedabad",
+    "raw_tags": "{\"name\": \"Ahmedabad Central Railway Freight Yard\", \"railway\": \"station\"}"
+  },
+  {
+    "osm_id": 1004,
+    "name": "Gujarat Cold Chain Logistics Hub",
+    "poi_category": "cold_storage",
+    "amenity": null,
+    "shop": null,
+    "latitude": 22.9812,
+    "longitude": 72.4921,
+    "state": "Gujarat",
+    "district": "Ahmedabad",
+    "raw_tags": "{\"name\": \"Gujarat Cold Chain Logistics Hub\", \"building\": \"warehouse\"}"
+  },
+  {
+    "osm_id": 2001,
+    "name": "Surat Textile Mega Wholesale Market",
+    "poi_category": "market",
+    "amenity": "marketplace",
+    "shop": "wholesale",
+    "latitude": 21.1959,
+    "longitude": 72.8302,
+    "state": "Gujarat",
+    "district": "Surat",
+    "raw_tags": "{\"name\": \"Surat Textile Mega Wholesale Market\", \"amenity\": \"marketplace\"}"
+  },
+  {
+    "osm_id": 2002,
+    "name": "Bank of Baroda Regional MSME Center",
+    "poi_category": "bank",
+    "amenity": "bank",
+    "shop": null,
+    "latitude": 21.2035,
+    "longitude": 72.8214,
+    "state": "Gujarat",
+    "district": "Surat",
+    "raw_tags": "{\"name\": \"Bank of Baroda Regional MSME Center\", \"amenity\": \"bank\"}"
+  },
+  {
+    "osm_id": 3001,
+    "name": "Rajkot Engineering & Machine Tools Cluster",
+    "poi_category": "industrial",
+    "amenity": null,
+    "shop": null,
+    "latitude": 22.2854,
+    "longitude": 70.7932,
+    "state": "Gujarat",
+    "district": "Rajkot",
+    "raw_tags": "{\"name\": \"Rajkot Engineering Cluster\", \"landuse\": \"industrial\"}"
+  },
+  {
+    "osm_id": 3002,
+    "name": "Rajkot Agri Produce Market Yard",
+    "poi_category": "market",
+    "amenity": "marketplace",
+    "shop": "wholesale",
+    "latitude": 22.3120,
+    "longitude": 70.8145,
+    "state": "Gujarat",
+    "district": "Rajkot",
+    "raw_tags": "{\"name\": \"Rajkot Agri Produce Market Yard\", \"amenity\": \"marketplace\"}"
+  },
+  {
+    "osm_id": 4001,
+    "name": "Morbi Ceramic Tiles Hub & Logistics Yard",
+    "poi_category": "industrial",
+    "amenity": null,
+    "shop": null,
+    "latitude": 22.8124,
+    "longitude": 70.8354,
+    "state": "Gujarat",
+    "district": "Morbi",
+    "raw_tags": "{\"name\": \"Morbi Ceramic Tiles Hub\", \"landuse\": \"industrial\"}"
+  },
+  {
+    "osm_id": 5001,
+    "name": "Vadodara Petrochemicals & Engineering Zone",
+    "poi_category": "industrial",
+    "amenity": null,
+    "shop": null,
+    "latitude": 22.3072,
+    "longitude": 73.1812,
+    "state": "Gujarat",
+    "district": "Vadodara",
+    "raw_tags": "{\"name\": \"Vadodara Engineering Zone\", \"landuse\": \"industrial\"}"
+  }
+]

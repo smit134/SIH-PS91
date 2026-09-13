@@ -130,13 +130,27 @@ async def login_user(
     payload: LoginRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(User).where(User.phone == payload.phone)
+    identifier = payload.phone.strip()
+    if "@" in identifier:
+        query = select(User).where(User.email.ilike(identifier))
+    else:
+        raw_digits = "".join(c for c in identifier if c.isdigit())
+        phone_variants = {identifier, raw_digits}
+        if raw_digits.startswith("91") and len(raw_digits) == 12:
+            phone_variants.add("+" + raw_digits)
+            phone_variants.add(raw_digits[2:])
+        elif len(raw_digits) == 10:
+            phone_variants.add("+91" + raw_digits)
+            phone_variants.add(raw_digits)
+
+        query = select(User).where(User.phone.in_(list(phone_variants)))
+
     result = await db.execute(query)
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(payload.password, user.hashed_password):
         raise UnauthorizedException(
-            message="Invalid mobile number or password."
+            message="Invalid mobile number/email or password."
         )
 
     if not user.is_active:
@@ -253,10 +267,23 @@ async def send_otp(
     )
     is_registered = existing_user.scalar_one_or_none() is not None
 
-    _, ttl = otp_manager.generate_otp(payload.phone)
+    code, ttl = otp_manager.generate_otp(payload.phone)
+
+    from app.core.sms import send_sms_otp
+    sms_dispatched, sms_msg = await send_sms_otp(payload.phone, code)
+
+    if not sms_dispatched:
+        if getattr(settings, "FAST2SMS_API_KEY", ""):
+            from app.core.exceptions import ValidationException
+            raise ValidationException(
+                message=f"SMS Gateway Error: {sms_msg}"
+            )
+        message = "FAST2SMS_API_KEY is not configured in backend/.env."
+    else:
+        message = f"OTP successfully dispatched via SMS to {payload.phone}."
 
     return SendOtpResponse(
-        message=f"OTP successfully dispatched to {payload.phone}.",
+        message=message,
         phone=payload.phone,
         expires_in_seconds=ttl,
         is_registered_user=is_registered,

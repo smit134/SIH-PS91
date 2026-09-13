@@ -8,8 +8,74 @@ def load_schemes() -> List[dict]:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     schemes_path = os.path.join(current_dir, '..', '..', 'data', 'schemes.json')
     
-    with open(schemes_path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    if os.path.exists(schemes_path):
+        with open(schemes_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+
+async def load_schemes_from_db(db) -> List[dict]:
+    """Loads real schemes from PostgreSQL schemes table."""
+    from sqlalchemy import select
+    from app.models.scheme import GovernmentScheme
+    
+    try:
+        res = await db.execute(select(GovernmentScheme).where(GovernmentScheme.is_active == True))
+        db_schemes = res.scalars().all()
+        converted = []
+        for s in db_schemes:
+            short = s.short_code or f"SCHEME_{str(s.id)[:6]}"
+            opps = [
+                "food_processing_spices", "handicraft_textiles",
+                "garment_tailoring_unit", "vermicompost_production",
+                "dairy_micro_farm", "organic_farm_inputs"
+            ]
+            converted.append({
+                "scheme_id": short.lower(),
+                "scheme_name": s.scheme_name,
+                "short_code": short,
+                "nodal_agency": s.authority_name or "Government of India",
+                "effective_from": "2023-01-01",
+                "project_cap": float(s.max_loan_amount) if s.max_loan_amount else 5000000.0,
+                "loan_cap": float(s.max_loan_amount) if s.max_loan_amount else 5000000.0,
+                "interest_rate": round(float(s.interest_rate_annual or 0.085) * 100, 2),
+                "subsidy_percent": round(float(s.subsidy_percentage or 0.0) * 100, 2),
+                "subsidy_rate_text": f"{int(float(s.subsidy_percentage or 0.0) * 100)}% Subsidy" if s.subsidy_percentage else "Interest Subvention",
+                "applicable_opportunities": opps,
+                "priority_category": "ALL",
+                "collateral_free": (s.max_loan_amount or 0) <= 1000000,
+                "description": s.description or s.benefits_text or "",
+                "eligibility": s.eligibility_rules if isinstance(s.eligibility_rules, dict) else {},
+                "benefits_summary": s.benefits_text or s.description or "",
+                "documents_required": s.required_documents if isinstance(s.required_documents, list) else ["Aadhaar Card", "Bank Account"],
+                "application_route": s.official_source_url or "https://myscheme.gov.in",
+                "official_source": s.official_source_url or "https://myscheme.gov.in",
+                "status_tag": f"{s.scheme_level or 'CENTRAL'} - {s.target_state or 'All-India'}",
+            })
+        return converted
+    except Exception:
+        return []
+
+
+async def get_merged_schemes(db=None) -> List[dict]:
+    """Merges schemes from JSON catalog and PostgreSQL DB with deduplication."""
+    file_schemes = load_schemes()
+    if not db:
+        return file_schemes
+
+    db_schemes = await load_schemes_from_db(db)
+    if not db_schemes:
+        return file_schemes
+
+    # Deduplicate by short_code / scheme_name
+    seen = {s.get("short_code", "").upper() for s in file_schemes if s.get("short_code")}
+    merged = list(file_schemes)
+    for ds in db_schemes:
+        code = ds.get("short_code", "").upper()
+        if code and code not in seen:
+            seen.add(code)
+            merged.append(ds)
+    return merged
 
 
 def calculate_subsidy_amount(scheme: dict, project_cost: float) -> float:
@@ -37,6 +103,19 @@ def calculate_subsidy_amount(scheme: dict, project_cost: float) -> float:
     return round(calculated, 2)
 
 
+async def match_schemes_async(
+    db=None,
+    user_profile: Optional[UserProfile] = None, 
+    project_cost: float = 150000.0, 
+    business_category: str = "all"
+) -> List[SchemeMatchItem]:
+    """
+    Evaluates and scores government schemes merging database and catalog sources.
+    """
+    schemes = await get_merged_schemes(db)
+    return _evaluate_schemes_list(schemes, user_profile, project_cost, business_category)
+
+
 def match_schemes(
     user_profile: Optional[UserProfile] = None, 
     project_cost: float = 150000.0, 
@@ -49,6 +128,15 @@ def match_schemes(
     3. User profile information (capital/equity, vocational skills, rural location, collateral)
     """
     schemes = load_schemes()
+    return _evaluate_schemes_list(schemes, user_profile, project_cost, business_category)
+
+
+def _evaluate_schemes_list(
+    schemes: List[dict],
+    user_profile: Optional[UserProfile] = None, 
+    project_cost: float = 150000.0, 
+    business_category: str = "all"
+) -> List[SchemeMatchItem]:
     matches: List[SchemeMatchItem] = []
     
     norm_cat = (business_category or "").strip().lower()

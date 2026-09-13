@@ -30,10 +30,11 @@ async def test_verify_otp_new_user_auto_onboard(client):
     send_res = await client.post("/api/v1/auth/otp/send", json={"phone": phone})
     assert send_res.status_code == 200
 
-    # Step 2: Verify using development bypass or valid OTP
+    # Step 2: Verify using the actual generated OTP code
+    actual_code = otp_manager._store[phone].code
     verify_payload = {
         "phone": phone,
-        "otp_code": "999999",
+        "otp_code": actual_code,
         "full_name": "Savitri Devi",
         "language": "hi",
     }
@@ -66,10 +67,11 @@ async def test_verify_otp_existing_user_login(client):
     assert send_res.status_code == 200
     assert send_res.json()["is_registered_user"] is True
 
-    # Verify OTP
+    # Verify OTP using actual code
+    actual_code = otp_manager._store[phone].code
     verify_res = await client.post(
         "/api/v1/auth/otp/verify",
-        json={"phone": phone, "otp_code": "999999"},
+        json={"phone": phone, "otp_code": actual_code},
     )
     assert verify_res.status_code == 200
     data = verify_res.json()

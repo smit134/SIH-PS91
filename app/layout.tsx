@@ -16,6 +16,8 @@ export const metadata: Metadata = {
 };
 
 import AiAssistant from "./components/AiAssistant";
+import { AuthProvider } from "@/app/context/AuthContext";
+import AuthGuard from "./components/AuthGuard";
 
 export default function RootLayout({
   children,
@@ -25,8 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen">
-        <ShellWrapper>{children}</ShellWrapper>
-        <AiAssistant />
+        <AuthProvider>
+          <AuthGuard>
+            <ShellWrapper>{children}</ShellWrapper>
+          </AuthGuard>
+          <AiAssistant />
+        </AuthProvider>
       </body>
     </html>
   );

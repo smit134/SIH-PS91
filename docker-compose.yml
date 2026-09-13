@@ -42,6 +42,7 @@ services:
       - DATABASE_SYNC_URL=postgresql+psycopg2://thinkforge:thinkforge_dev_password@db:5432/thinkforge
       - JWT_SECRET_KEY=thinkforge_super_secure_dev_jwt_secret_key_32chars!
       - CORS_ORIGINS=["http://localhost:3000","http://localhost:5173","http://localhost:8080"]
+      - FAST2SMS_API_KEY=2fkPJQo7vepDHKNtqi4TZSCU5aX8ExrYw0GzWgLABsm3uFIy6dBwV1UJcEdjXR0CDIWrvHmQay5iLO2n
     ports:
       - "8000:8000"
     volumes:

@@ -11,6 +11,13 @@ export default function ProfilePage() {
   const [name, setName] = useState("Loading...");
   const [profile, setProfile] = useState<any>(null);
 
+  const handleLogout = () => {
+    localStorage.removeItem("thinkforge_token");
+    localStorage.removeItem("thinkforge_name");
+    localStorage.removeItem("thinkforge_profile");
+    router.push("/auth");
+  };
+
   useEffect(() => {
     const updateProfileData = () => {
       const storedName = localStorage.getItem("thinkforge_name");
@@ -19,7 +26,6 @@ export default function ProfilePage() {
       } else {
         setName("Rural Entrepreneur");
       }
-
       const storedProfileStr = localStorage.getItem("thinkforge_profile");
       if (storedProfileStr) {
         try {
@@ -28,13 +34,9 @@ export default function ProfilePage() {
           console.error("Failed to parse profile", e);
         }
       }
-    }
-  }, []);  const handleLogout = () => {
-    localStorage.removeItem("thinkforge_token");
-    localStorage.removeItem("thinkforge_name");
-    localStorage.removeItem("thinkforge_profile");
-    router.push("/auth");
-  };
+    };
+    updateProfileData();
+  }, []);
 
   const getInitials = (n: string) => {
     if (!n || n === "Loading...") return "EN";
