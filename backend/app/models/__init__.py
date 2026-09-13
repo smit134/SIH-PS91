@@ -33,6 +33,7 @@ from app.models.evidence import (
     EvidenceType,
 )
 from app.models.audit import AuditLog
+from app.models.interaction import UserInteraction, InteractionType
 
 __all__ = [
     # Pydantic Schemas
@@ -77,4 +78,6 @@ __all__ = [
     "EvidenceReliabilityClass",
     "EvidenceType",
     "AuditLog",
+    "UserInteraction",
+    "InteractionType",
 ]

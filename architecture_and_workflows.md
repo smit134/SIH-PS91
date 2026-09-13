@@ -121,7 +121,7 @@ This document outlines the entire technical structure of the ThinkForge platform
 
 ### Detailed Features & APIs
 * **Hyper-Local Opportunity Intelligence:** Sources and stores local data signals, returning opportunity metrics based on density and population proxies.
-* **Evidence-Aware AI Explanations:** Uses LLMs exclusively for explaining SWOT, reasoning recommendations, and generating natural-language business plans—never for calculating deterministic financials.
+* **Evidence-Aware AI Explanations:** Uses LLMs exclusively for explaining SWOT, reasoning recommendations, and generating natural-language business plans—never for calculating deterministic financials.  
 * **APIs:** `GET /evidence/nearby`.
 * **Models:** `EvidenceRecord`.
 

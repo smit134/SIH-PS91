@@ -127,9 +127,9 @@ BUSINESS_CATALOG: Dict[str, BusinessCategory] = {
             inherent_risk=RiskLevel.LOW
         ),
         tags=["tailoring", "garments", "stitching", "uniforms", "micro-enterprise"]
-    )
-}
+    ),
 
+}
 
 def get_all_businesses() -> List[BusinessCategory]:
     return list(BUSINESS_CATALOG.values())

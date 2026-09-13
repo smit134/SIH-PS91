@@ -15,6 +15,7 @@ from ..models.business import (
 )
 from ..models.common import RiskLevel, EvidenceClass
 from ..config import settings, OpportunityScoringWeights
+from sqlalchemy.ext.asyncio import AsyncSession
 from ..data.business_catalog import get_all_businesses, get_business_by_id
 from .geospatial_engine import GeospatialEngine
 
@@ -143,8 +144,9 @@ class OpportunityEngine:
             return 45.0
 
     @classmethod
-    def score_business(
+    async def score_business(
         cls,
+        session: AsyncSession,
         profile: EntrepreneurProfile,
         business: BusinessCategory,
         weights: Optional[OpportunityScoringWeights] = None
@@ -156,11 +158,12 @@ class OpportunityEngine:
         w = weights or settings.DEFAULT_OPPORTUNITY_WEIGHTS
 
         # 1. Hyper-local signal
-        local_snapshot = GeospatialEngine.evaluate_local_signals(
-            profile.location.latitude,
-            profile.location.longitude,
-            profile.location.service_radius_km,
-            business.id
+        local_snapshot = await GeospatialEngine.evaluate_local_signals(
+            session=session,
+            lat=profile.location.latitude,
+            lon=profile.location.longitude,
+            radius_km=profile.location.service_radius_km,
+            category=business.id
         )
         local_opp_score = local_snapshot.local_opportunity_composite
 
@@ -290,8 +293,9 @@ class OpportunityEngine:
         )
 
     @classmethod
-    def reverse_business_search(
+    async def reverse_business_search(
         cls,
+        session: AsyncSession,
         profile: EntrepreneurProfile,
         weights: Optional[OpportunityScoringWeights] = None
     ) -> ReverseSearchResult:
@@ -304,11 +308,33 @@ class OpportunityEngine:
         scored_results: List[BusinessFitResult] = []
 
         for b in all_businesses:
-            res = cls.score_business(profile, b, weights)
+            res = await cls.score_business(session, profile, b, weights)
             scored_results.append(res)
 
         scored_results.sort(key=lambda x: x.overall_fit_score, reverse=True)
-        top_rec = scored_results[0]
+        
+        # --- AI PERSONALIZATION LAYER ---
+        from sqlalchemy import select
+        from ..models.interaction import UserInteraction
+        
+        interactions = []
+        try:
+            uid_str = profile.user_id
+            stmt = select(UserInteraction).where(UserInteraction.user_id == uid_str)
+            result = await session.execute(stmt)
+            interactions = result.scalars().all()
+        except Exception as e:
+            print(f"Error fetching interactions: {e}")
+            
+        if interactions:
+            from ..services.llm_service import personalize_recommendations
+            top_candidates = scored_results[:10]  # Only send top 10 to LLM to save context
+            ranked_top = await personalize_recommendations(profile, interactions, top_candidates)
+            
+            # Reconstruct the full list: ranked AI results first, then the rest
+            scored_results = ranked_top + [r for r in scored_results if r not in ranked_top]
+
+        top_rec = scored_results[0] if scored_results else None
 
         return ReverseSearchResult(
             total_evaluated=len(all_businesses),
@@ -319,8 +345,9 @@ class OpportunityEngine:
         )
 
     @classmethod
-    def compare_businesses(
+    async def compare_businesses(
         cls,
+        session: AsyncSession,
         profile: EntrepreneurProfile,
         business_ids: List[str]
     ) -> BusinessComparisonResult:
@@ -331,11 +358,12 @@ class OpportunityEngine:
         for bid in business_ids:
             biz = get_business_by_id(bid)
             if biz:
-                results.append(cls.score_business(profile, biz))
+                results.append(await cls.score_business(session, profile, biz))
 
         if not results:
             # Fallback to top 3 from catalog
-            results = cls.reverse_business_search(profile).ranked_opportunities[:3]
+            reverse_results = await cls.reverse_business_search(session, profile)
+            results = reverse_results.ranked_opportunities[:3]
 
         # Build comparison table
         table_rows = []

@@ -11,54 +11,85 @@ export default function OpportunitiesPage() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOpp, setSelectedOpp] = useState<any | null>(null);
+  const [interacted, setInteracted] = useState<Record<string, 'LIKE' | 'DISLIKE'>>({});
+  const [isInteracting, setIsInteracting] = useState<string | null>(null);
+
+  const handleInteract = async (business_id: string, interaction_type: 'LIKE' | 'DISLIKE') => {
+    setIsInteracting(business_id);
+    try {
+      await fetch("http://localhost:8000/api/intelligence/opportunity/interact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: "demo_user",
+          business_id,
+          interaction_type
+        })
+      });
+      
+      // Update local state to show visual feedback
+      setInteracted(prev => ({ ...prev, [business_id]: interaction_type }));
+      
+      // Fetch new opportunities after a short delay so user sees the feedback first
+      setTimeout(() => {
+        fetchOpps();
+      }, 500);
+      
+    } catch (e) {
+      console.error("Failed to record interaction", e);
+    } finally {
+      setIsInteracting(null);
+    }
+  };
+
+  const fetchOpps = async () => {
+    try {
+      setLoading(true);
+      const storedProfile = localStorage.getItem("thinkforge_profile");
+      const rawProfile = storedProfile ? JSON.parse(storedProfile) : {};
+      
+      const profile = {
+        user_id: "demo_user",
+        name: "Rural Entrepreneur",
+        available_capital: rawProfile.ownEquity ? parseInt(rawProfile.ownEquity.replace(/[^0-9]/g, "")) : 150000,
+        skills: [rawProfile.primarySkill || "Agri-Processing"],
+        experience_years: 2.0,
+        resources: [rawProfile.landAccess || "Owned", rawProfile.powerSupply || "3-Phase"],
+        interests: [rawProfile.sectorInterest || "Post-Harvest"],
+        location: {
+          latitude: 20.7453,
+          longitude: 78.6022,
+          village_or_town: rawProfile.block || "Deoli",
+          district: rawProfile.district || "Wardha",
+          state: rawProfile.state || "Maharashtra",
+          service_radius_km: 15.0
+        },
+        risk_preference: "Medium",
+        has_transport_access: !!rawProfile.transportVehicle,
+        has_market_connections: false,
+        has_digital_tools: true
+      };
+
+      const res = await fetch("http://localhost:8000/api/intelligence/opportunity/recommendations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setOpportunities(data);
+      } else {
+        console.error("Failed to fetch opportunities", await res.text());
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOpps = async () => {
-      try {
-        const storedProfile = localStorage.getItem("thinkforge_profile");
-        const rawProfile = storedProfile ? JSON.parse(storedProfile) : {};
-        
-        // Map UI profile format to Backend EntrepreneurProfile schema
-        const profile = {
-          user_id: "demo_user",
-          name: "Rural Entrepreneur",
-          available_capital: rawProfile.ownEquity ? parseInt(rawProfile.ownEquity.replace(/[^0-9]/g, "")) : 150000,
-          skills: [rawProfile.primarySkill || "Agri-Processing"],
-          experience_years: 2.0,
-          resources: [rawProfile.landAccess || "Owned", rawProfile.powerSupply || "3-Phase"],
-          interests: [rawProfile.sectorInterest || "Post-Harvest"],
-          location: {
-            latitude: 20.7453,
-            longitude: 78.6022,
-            village_or_town: rawProfile.block || "Deoli",
-            district: rawProfile.district || "Wardha",
-            state: rawProfile.state || "Maharashtra",
-            service_radius_km: 15.0
-          },
-          risk_preference: "Medium",
-          has_transport_access: !!rawProfile.transportVehicle,
-          has_market_connections: false,
-          has_digital_tools: true
-        };
-
-        const res = await fetch("http://localhost:8000/api/intelligence/opportunity/recommendations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(profile)
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setOpportunities(data);
-        } else {
-          console.error("Failed to fetch opportunities", await res.text());
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOpps();
   }, []);
 
@@ -108,7 +139,7 @@ export default function OpportunitiesPage() {
                 key={idx}
                 className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card hover:shadow-card-elevated hover:border-brand-500/50 transition-all group flex flex-col"
               >
-                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-start justify-between gap-2 mb-3">
                   <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                     {opp.sector || t("opp_agri_tech")}
                   </span>
@@ -118,6 +149,13 @@ export default function OpportunitiesPage() {
                 <h3 className="text-lg font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
                   {opp.business_name || opp.title}
                 </h3>
+                
+                {opp.ai_rationale && (
+                  <div className="mt-2 text-xs text-brand-700 bg-brand-50 p-2 rounded border border-brand-200">
+                    <Sparkles className="w-3 h-3 inline mr-1" />
+                    {opp.ai_rationale}
+                  </div>
+                )}
 
                 <div className="mt-4 grid grid-cols-3 gap-3 py-3 px-3.5 rounded-xl bg-slate-50 border border-slate-100 text-center">
                   <div>
