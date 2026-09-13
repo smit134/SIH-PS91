@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import Footer from "@/components/Footer";
 import { Menu, Sparkles, UserCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -47,6 +48,42 @@ export default function ShellWrapper({ children }: { children: React.ReactNode }
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col">{children}</main>
+
+        {/* Footer for Register Page */}
+        <Footer dark />
+      </div>
+    );
+  }
+
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white">
+        {/* Focused Auth Header */}
+        <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-emerald-600 flex items-center justify-center text-white shadow-glow-teal">
+              <Sparkles className="w-5 h-5 text-emerald-200" />
+            </div>
+            <div>
+              <span className="font-bold text-lg text-white tracking-tight">
+                Think<span className="text-brand-400">Forge</span>
+              </span>
+              <span className="ml-2 text-[10px] font-bold uppercase tracking-wider bg-brand-950 text-brand-400 border border-brand-800/80 px-2 py-0.5 rounded">
+                SIH26091
+              </span>
+            </div>
+          </Link>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-400 font-medium">Rural Enterprise Portal</span>
+          </div>
+        </header>
+
+        {/* Auth Content */}
+        <main className="flex-1 flex flex-col justify-center">{children}</main>
+
+        {/* Footer for Auth Page */}
+        <Footer dark />
       </div>
     );
   }
@@ -91,6 +128,9 @@ export default function ShellWrapper({ children }: { children: React.ReactNode }
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
+
+        {/* Global Platform Footer */}
+        <Footer />
       </div>
     </div>
   );
